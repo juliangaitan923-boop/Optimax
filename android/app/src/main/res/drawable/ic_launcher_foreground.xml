@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Lightning bolt -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M58,18 L38,52 L50,52 L44,88 L72,48 L58,48 Z"/>
+    <!-- Speed lines left -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:fillAlpha="0.6"
+        android:pathData="M20,54 L28,54 L28,60 L20,60 Z"/>
+    <path
+        android:fillColor="#FFFFFF"
+        android:fillAlpha="0.4"
+        android:pathData="M16,62 L24,62 L24,66 L16,66 Z"/>
+    <path
+        android:fillColor="#FFFFFF"
+        android:fillAlpha="0.3"
+        android:pathData="M12,70 L20,70 L20,73 L12,73 Z"/>
+    <!-- Speed lines right -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:fillAlpha="0.6"
+        android:pathData="M80,54 L88,54 L88,60 L80,60 Z"/>
+    <path
+        android:fillColor="#FFFFFF"
+        android:fillAlpha="0.4"
+        android:pathData="M84,62 L92,62 L92,66 L84,66 Z"/>
+    <path
+        android:fillColor="#FFFFFF"
+        android:fillAlpha="0.3"
+        android:pathData="M88,70 L96,70 L96,73 L88,73 Z"/>
+    <!-- Bottom arc -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:fillAlpha="0.2"
+        android:pathData="M34,88 Q54,96 74,88"
+        android:strokeWidth="2"
+        android:strokeColor="#FFFFFF"/>
+</vector>
