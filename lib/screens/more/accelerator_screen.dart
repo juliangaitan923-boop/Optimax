@@ -1,0 +1,425 @@
+import 'dart:async';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../core/constants.dart';
+import '../../models/process_info.dart';
+import '../../providers/system_providers.dart';
+import '../../services/mock_service.dart';
+import '../../widgets/glass_card.dart';
+import '../../widgets/gradient_button.dart';
+
+class AcceleratorScreen extends ConsumerStatefulWidget {
+  const AcceleratorScreen({super.key});
+
+  @override
+  ConsumerState<AcceleratorScreen> createState() => _AcceleratorScreenState();
+}
+
+class _AcceleratorScreenState extends ConsumerState<AcceleratorScreen> {
+  List<ProcessInfo> _processes = [];
+  bool _loading = true;
+  bool _boosting = false;
+  int _totalToKill = 0;
+  int _killedSoFar = 0;
+  Timer? _realtimeTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProcesses();
+    _startRealtimeMonitor();
+  }
+
+  @override
+  void dispose() {
+    _realtimeTimer?.cancel();
+    super.dispose();
+  }
+
+  void _startRealtimeMonitor() {
+    _realtimeTimer?.cancel();
+    _realtimeTimer = Timer.periodic(const Duration(seconds: 2), (_) {
+      if (!_boosting && mounted) {
+        _loadProcesses();
+      }
+    });
+  }
+
+  Future<void> _loadProcesses() async {
+    try {
+      final service = ref.read(deviceServiceProvider);
+      final processes = await service.getProcessList();
+      if (processes.isEmpty) {
+        final mock = await MockService.getProcessList();
+        if (mounted) setState(() => _processes = mock);
+      } else {
+        if (mounted) setState(() => _processes = processes);
+      }
+    } catch (_) {
+      final mock = await MockService.getProcessList();
+      if (mounted) setState(() => _processes = mock);
+    }
+    if (mounted) setState(() => _loading = false);
+  }
+
+  Future<void> _boost() async {
+    setState(() {
+      _boosting = true;
+      _killedSoFar = 0;
+      _totalToKill = _processes.where((p) => !p.isSystem).length;
+    });
+
+    final service = ref.read(deviceServiceProvider);
+    Map<String, dynamic> result;
+
+    try {
+      result = await service.deepBoost();
+    } catch (_) {
+      result = await MockService.ramBoost();
+    }
+
+    final ramFreedBytes = result['ramFreed'] as int? ?? 0;
+    final processesKilled = result['processesKilled'] as int? ?? 0;
+    final killedList = result['killedProcesses'] as List<dynamic>? ?? [];
+
+    setState(() {
+      _killedSoFar = processesKilled;
+      _totalToKill = processesKilled;
+    });
+
+    await Future.delayed(const Duration(milliseconds: 300));
+    ref.invalidate(ramInfoProvider);
+    setState(() => _boosting = false);
+    _loadProcesses();
+
+    if (!mounted) return;
+    showDialog(
+      context: context,
+      builder: (ctx) => _BoostResultDialog(
+        ramFreed: ramFreedBytes,
+        processesKilled: processesKilled,
+        killedList: killedList.cast<String>(),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final ramAsync = ref.watch(ramInfoProvider);
+    final ram = ramAsync.valueOrNull;
+
+    final killableProcesses = _processes.where((p) => !p.isSystem).toList();
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Acelerador', style: TextStyle(fontWeight: FontWeight.bold)),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 8),
+
+            // RAM status en vivo
+            GlassCard(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  Container(
+                    width: 56, height: 56,
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [AppColors.primary, AppColors.secondary],
+                        begin: Alignment.topLeft, end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: const Icon(Icons.bolt, color: Colors.white, size: 28),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text('Acelerar dispositivo', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+                        const SizedBox(height: 4),
+                        Text(
+                          ram != null
+                              ? 'RAM: ${ram.usedFormatted} / ${ram.totalFormatted} (${ram.usagePercent}%)'
+                              : 'Cargando...',
+                          style: const TextStyle(fontSize: 13, color: AppColors.textMuted),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // RAM gauge en tiempo real
+            if (ram != null)
+              GlassCard(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text('Memoria RAM', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white)),
+                        Text(
+                          '${ram.usagePercent}% usado',
+                          style: TextStyle(
+                            fontSize: 14, fontWeight: FontWeight.bold,
+                            color: ram.usagePercent > 70 ? AppColors.warning : AppColors.success,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: LinearProgressIndicator(
+                        value: ram.usagePercent / 100.0,
+                        minHeight: 12,
+                        backgroundColor: Colors.white.withOpacity(0.05),
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          ram.usagePercent > 70 ? AppColors.warning : AppColors.success,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('Usado: ${ram.usedFormatted}', style: const TextStyle(fontSize: 12, color: AppColors.textMuted)),
+                        Text('${killableProcesses.length} procesos cerrables', style: const TextStyle(fontSize: 12, color: AppColors.textMuted)),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            const SizedBox(height: 16),
+
+            // Deep Boost button
+            _boosting
+                ? GlassCard(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      children: [
+                        const SizedBox(
+                          height: 40, width: 40,
+                          child: CircularProgressIndicator(strokeWidth: 3, color: AppColors.primary),
+                        ),
+                        const SizedBox(height: 12),
+                        Text('Acelerando a fondo... $_killedSoFar procesos cerrados',
+                          style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600)),
+                        const SizedBox(height: 8),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: LinearProgressIndicator(
+                            value: _totalToKill > 0 ? (_killedSoFar / _totalToKill).clamp(0.0, 1.0) : 0,
+                            minHeight: 6,
+                            backgroundColor: Colors.white.withOpacity(0.05),
+                            valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primary),
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text('$_killedSoFar / $_totalToKill procesos',
+                          style: const TextStyle(fontSize: 12, color: AppColors.textMuted)),
+                      ],
+                    ),
+                  )
+                : GradientButton(
+                    label: killableProcesses.isNotEmpty
+                        ? 'Acelerar a fondo (${killableProcesses.length} procesos)'
+                        : 'Acelerar a fondo',
+                    icon: Icons.bolt,
+                    isLoading: _boosting,
+                    onPressed: _boosting ? null : _boost,
+                  ),
+            const SizedBox(height: 16),
+
+            // Process list en tiempo real
+            GlassCard(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(Icons.settings_applications, color: AppColors.info, size: 18),
+                      const SizedBox(width: 8),
+                      const Expanded(
+                        child: Text('Procesos del sistema', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white)),
+                      ),
+                      if (!_loading)
+                        Text('${_processes.length} activos', style: const TextStyle(fontSize: 12, color: AppColors.textMuted)),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  if (_loading)
+                    const Center(child: Padding(
+                      padding: EdgeInsets.all(20),
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ))
+                  else if (_processes.isEmpty)
+                    const Padding(
+                      padding: EdgeInsets.all(20),
+                      child: Center(child: Text('No hay procesos disponibles', style: TextStyle(color: AppColors.textMuted))),
+                    )
+                  else
+                    ..._processes.map((proc) => _processTile(proc)),
+                ],
+              ),
+            ),
+            const SizedBox(height: 24),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _processTile(ProcessInfo proc) {
+    final canKill = !proc.isSystem;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 6),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          color: Colors.transparent,
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 36, height: 36,
+              decoration: BoxDecoration(
+                color: canKill ? AppColors.primary.withOpacity(0.15) : Colors.white.withOpacity(0.05),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(
+                proc.isSystem ? Icons.security : Icons.android,
+                color: canKill ? AppColors.primary : AppColors.textMuted,
+                size: 18,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(proc.name, style: TextStyle(color: canKill ? Colors.white : AppColors.textMuted, fontSize: 14, fontWeight: FontWeight.w500)),
+                  Text(proc.importanceLabel, style: const TextStyle(color: AppColors.textMuted, fontSize: 11)),
+                ],
+              ),
+            ),
+            if (!canKill)
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  color: AppColors.warning.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: const Text('Sistema', style: TextStyle(color: AppColors.warning, fontSize: 10, fontWeight: FontWeight.w600)),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _BoostResultDialog extends StatelessWidget {
+  final int ramFreed;
+  final int processesKilled;
+  final List<String> killedList;
+
+  const _BoostResultDialog({
+    required this.ramFreed,
+    required this.processesKilled,
+    required this.killedList,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      backgroundColor: Colors.transparent,
+      child: GlassCard(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 64, height: 64,
+              decoration: const BoxDecoration(color: AppColors.success, shape: BoxShape.circle),
+              child: const Icon(Icons.bolt, color: Colors.white, size: 36),
+            ),
+            const SizedBox(height: 16),
+            const Text('Aceleración completada',
+              style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 20),
+            _resultRow(Icons.memory, 'RAM liberada', _formatBytes(ramFreed)),
+            const SizedBox(height: 12),
+            _resultRow(Icons.close, 'Procesos cerrados', '$processesKilled'),
+            if (killedList.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              const Divider(color: Colors.white10, height: 16),
+              SizedBox(
+                height: (killedList.length * 24).clamp(0, 120).toDouble(),
+                child: ListView(
+                  children: killedList.map((name) => Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 2),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.check, color: AppColors.success, size: 14),
+                        const SizedBox(width: 8),
+                        Text(name, style: const TextStyle(color: AppColors.textSecondary, fontSize: 12)),
+                      ],
+                    ),
+                  )).toList(),
+                ),
+              ),
+            ],
+            const SizedBox(height: 24),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                foregroundColor: Colors.white,
+                minimumSize: const Size(double.infinity, 44),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+              ),
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Aceptar', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _resultRow(IconData icon, String label, String value) {
+    return Row(
+      children: [
+        Container(
+          width: 40, height: 40,
+          decoration: BoxDecoration(color: AppColors.primary.withOpacity(0.15), borderRadius: BorderRadius.circular(12)),
+          child: Icon(icon, color: AppColors.primary, size: 20),
+        ),
+        const SizedBox(width: 14),
+        Expanded(child: Text(label, style: const TextStyle(color: AppColors.textSecondary, fontSize: 14))),
+        Text(value, style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
+      ],
+    );
+  }
+
+  String _formatBytes(int bytes) {
+    if (bytes < 1024) return '$bytes B';
+    if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(0)} KB';
+    if (bytes < 1024 * 1024 * 1024) return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
+    return '${(bytes / (1024 * 1024 * 1024)).toStringAsFixed(1)} GB';
+  }
+}
