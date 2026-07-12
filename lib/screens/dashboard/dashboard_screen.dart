@@ -49,14 +49,14 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           children: [
             Container(
               padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 gradient: LinearGradient(colors: [AppColors.primary, AppColors.secondary], begin: Alignment.topLeft, end: Alignment.bottomRight),
                 borderRadius: BorderRadius.all(Radius.circular(12)),
               ),
-              child: Icon(Icons.speed, color: Colors.white, size: 20),
+              child: const Icon(Icons.speed, color: Colors.white, size: 20),
             ),
-            SizedBox(width: 12),
-            Text('OptiMax', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 24, letterSpacing: -0.5)),
+            const SizedBox(width: 12),
+            const Text('OptiMax', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 24, letterSpacing: -0.5)),
           ],
         ),
         backgroundColor: Colors.transparent,
@@ -96,7 +96,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               GlassCard(
                 child: Column(
                   children: [
-                    Text(AppStrings.healthScore, style: const TextStyle(color: AppColors.textSecondary, fontSize: 14)),
+                    const Text(AppStrings.healthScore, style: TextStyle(color: AppColors.textSecondary, fontSize: 14)),
                     const SizedBox(height: 12),
                     AnimatedCircularScore(score: healthScore),
                     const SizedBox(height: 12),

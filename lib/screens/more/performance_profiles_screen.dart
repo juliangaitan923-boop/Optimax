@@ -30,7 +30,7 @@ class PerformanceProfilesScreen extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 8),
-            Text(
+            const Text(
               'Selecciona un perfil',
               style: TextStyle(
                 color: AppColors.textSecondary,
@@ -129,7 +129,7 @@ class _ProfileCard extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       data.description,
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: AppColors.textMuted,
                         fontSize: 13,
                       ),

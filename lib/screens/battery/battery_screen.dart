@@ -150,11 +150,11 @@ class _BatteryScreenState extends ConsumerState<BatteryScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
+                  const Row(
                     children: [
-                      const Icon(Icons.battery_charging_full, color: AppColors.warning, size: 18),
-                      const SizedBox(width: 8),
-                      const Text('Apps con más consumo de batería',
+                      Icon(Icons.battery_charging_full, color: AppColors.warning, size: 18),
+                      SizedBox(width: 8),
+                      Text('Apps con más consumo de batería',
                         style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white)),
                     ],
                   ),
@@ -328,7 +328,7 @@ class _BatteryScreenState extends ConsumerState<BatteryScreen> {
                 ],
               ),
             ),
-            Icon(Icons.chevron_right, color: AppColors.textMuted, size: 18),
+            const Icon(Icons.chevron_right, color: AppColors.textMuted, size: 18),
           ],
         ),
       ),

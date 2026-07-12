@@ -20,6 +20,12 @@ class AppColors {
   static const info = Color(0xFF60CFFF);
   static const gradientStart = Color(0xFF7C6FFF);
   static const gradientEnd = Color(0xFF00E5A0);
+
+  static const lightBackground = Color(0xFFF5F5FA);
+  static const lightCard = Colors.white;
+  static const lightText = Color(0xFF1A1A2E);
+  static const lightTextSecondary = Color(0xFF444466);
+  static const lightBorder = Color(0xFFE0E0F0);
 }
 
 class AppStrings {

@@ -9,4 +9,7 @@ build/
 *.log
 *.apk
 *.aab
+*.jks
 local.properties
+key.properties
+.DS_Store

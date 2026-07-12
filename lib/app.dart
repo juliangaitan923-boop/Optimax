@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'core/constants.dart';
 import 'core/theme.dart';
 import 'screens/dashboard/dashboard_screen.dart';
 import 'screens/cleaner/cleaner_screen.dart';
 import 'screens/battery/battery_screen.dart';
 import 'screens/more/more_screen.dart';
+import 'screens/onboarding/onboarding_screen.dart';
 import 'providers/system_providers.dart';
+import 'providers/theme_provider.dart';
 import 'services/update_service.dart';
 import 'services/app_info.dart';
+import 'services/logger_service.dart';
 import 'widgets/glass_card.dart';
 
 class OptiMaxApp extends ConsumerWidget {
@@ -16,12 +20,59 @@ class OptiMaxApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final themeMode = ref.watch(themeProvider.notifier).themeMode;
     return MaterialApp(
       title: 'OptiMax',
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.darkTheme,
-      home: const MainShell(),
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: themeMode,
+      home: const _AppEntry(),
     );
+  }
+}
+
+class _AppEntry extends ConsumerStatefulWidget {
+  const _AppEntry();
+
+  @override
+  ConsumerState<_AppEntry> createState() => _AppEntryState();
+}
+
+class _AppEntryState extends ConsumerState<_AppEntry> {
+  bool? _showOnboarding;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkOnboarding();
+  }
+
+  Future<void> _checkOnboarding() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final completed = prefs.getBool('onboarding_completed') ?? false;
+      if (mounted) {
+        setState(() => _showOnboarding = !completed);
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _showOnboarding = false);
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_showOnboarding == null) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+    if (_showOnboarding!) {
+      return const OnboardingScreen();
+    }
+    return const MainShell();
   }
 }
 
@@ -67,7 +118,9 @@ class _MainShellState extends ConsumerState<MainShell> {
           ),
         );
       }
-    } catch (_) {}
+    } catch (e) {
+      log.e('Update check failed', e);
+    }
   }
 
   void _showUpdateDialog(UpdateInfo info) {
@@ -139,12 +192,6 @@ class _MainShellState extends ConsumerState<MainShell> {
   }
 
   @override
-  void dispose() {
-    _updateChecked = true;
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     final currentIndex = ref.watch(tabIndexProvider);
     return Scaffold(
@@ -189,7 +236,6 @@ class _MainShellState extends ConsumerState<MainShell> {
             selectedFontSize: 11,
             unselectedFontSize: 11,
             items: List.generate(4, (i) {
-              final isSelected = currentIndex == i;
               return BottomNavigationBarItem(
                 icon: _NavIcon(i, isSelected: false),
                 activeIcon: _NavIcon(i, isSelected: true),
@@ -252,9 +298,9 @@ class _UpdateProgressDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Dialog(
+    return const Dialog(
       backgroundColor: Colors.transparent,
-      child: GlassCard(
+      child: const GlassCard(
         padding: const EdgeInsets.all(32),
         child: const Column(
           mainAxisSize: MainAxisSize.min,

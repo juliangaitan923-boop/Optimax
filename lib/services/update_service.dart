@@ -56,7 +56,7 @@ class UpdateService {
     } catch (_) {}
   }
 
-  static int _compareVersions(String a, String b) {
+  static int compareVersions(String a, String b) {
     final partsA = a.split('.').map(int.parse).toList();
     final partsB = b.split('.').map(int.parse).toList();
     final len = partsA.length > partsB.length ? partsB.length : partsA.length;
@@ -82,7 +82,7 @@ class UpdateService {
       if (info.version == currentVersion) return null;
       final skipped = await _getSkippedVersions();
       if (skipped.contains(info.version)) return null;
-      if (_compareVersions(info.version, currentVersion) <= 0) return null;
+      if (compareVersions(info.version, currentVersion) <= 0) return null;
       return info;
     } catch (_) {
       return null;

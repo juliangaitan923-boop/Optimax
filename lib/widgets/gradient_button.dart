@@ -39,7 +39,7 @@ class _GradientButtonState extends State<GradientButton> {
         height: widget.height ?? 58,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(18),
-          gradient: LinearGradient(
+          gradient: const LinearGradient(
             colors: [AppColors.primary, AppColors.secondary],
             begin: Alignment.centerLeft,
             end: Alignment.centerRight,

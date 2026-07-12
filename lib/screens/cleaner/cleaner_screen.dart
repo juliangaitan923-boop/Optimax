@@ -41,11 +41,11 @@ class _CleanerScreenState extends ConsumerState<CleanerScreen> {
             GlassCard(
               child: Column(
                 children: [
-                  Row(
+                  const Row(
                     children: [
-                      const Icon(Icons.info_outline, color: AppColors.info, size: 20),
-                      const SizedBox(width: 8),
-                      const Expanded(
+                      Icon(Icons.info_outline, color: AppColors.info, size: 20),
+                      SizedBox(width: 8),
+                      Expanded(
                         child: Text(
                           'Escanea y elimina archivos innecesarios para liberar espacio y mejorar el rendimiento.',
                           style: TextStyle(color: AppColors.textSecondary, fontSize: 13),
