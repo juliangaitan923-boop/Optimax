@@ -94,6 +94,13 @@ class _MainShellState extends ConsumerState<MainShell> {
         ),
         actions: [
           TextButton(
+            onPressed: () {
+              Navigator.pop(ctx);
+              UpdateService.skipVersion(info.version);
+            },
+            child: const Text('Saltar versión', style: TextStyle(color: AppColors.textMuted)),
+          ),
+          TextButton(
             onPressed: () => Navigator.pop(ctx),
             child: const Text('Más tarde', style: TextStyle(color: AppColors.textMuted)),
           ),

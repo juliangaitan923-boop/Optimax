@@ -31,6 +31,42 @@ class UpdateService {
 
   static String get updateUrl => _updateUrl;
 
+  static Future<List<String>> _getSkippedVersions() async {
+    try {
+      final dir = await getTemporaryDirectory();
+      final file = File('${dir.path}/.skipped_updates');
+      if (!file.existsSync()) return [];
+      final content = await file.readAsString();
+      final data = jsonDecode(content) as Map<String, dynamic>;
+      return List<String>.from(data['versions'] ?? []);
+    } catch (_) {
+      return [];
+    }
+  }
+
+  static Future<void> _addSkippedVersion(String version) async {
+    try {
+      final dir = await getTemporaryDirectory();
+      final file = File('${dir.path}/.skipped_updates');
+      final versions = await _getSkippedVersions();
+      if (!versions.contains(version)) {
+        versions.add(version);
+      }
+      await file.writeAsString(jsonEncode({'versions': versions}));
+    } catch (_) {}
+  }
+
+  static int _compareVersions(String a, String b) {
+    final partsA = a.split('.').map(int.parse).toList();
+    final partsB = b.split('.').map(int.parse).toList();
+    final len = partsA.length > partsB.length ? partsB.length : partsA.length;
+    for (int i = 0; i < len; i++) {
+      if (partsA[i] > partsB[i]) return 1;
+      if (partsA[i] < partsB[i]) return -1;
+    }
+    return partsA.length.compareTo(partsB.length);
+  }
+
   static Future<UpdateInfo?> checkForUpdate(String currentVersion) async {
     try {
       final client = HttpClient();
@@ -42,11 +78,19 @@ class UpdateService {
       client.close();
       final json = jsonDecode(body) as Map<String, dynamic>;
       final info = UpdateInfo.fromJson(json);
-      if (!info.isValid || info.version == currentVersion) return null;
+      if (!info.isValid) return null;
+      if (info.version == currentVersion) return null;
+      final skipped = await _getSkippedVersions();
+      if (skipped.contains(info.version)) return null;
+      if (_compareVersions(info.version, currentVersion) <= 0) return null;
       return info;
     } catch (_) {
       return null;
     }
+  }
+
+  static Future<void> skipVersion(String version) async {
+    await _addSkippedVersion(version);
   }
 
   static Future<bool> downloadAndInstall(UpdateInfo info) async {
