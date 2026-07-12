@@ -694,7 +694,6 @@ class MainActivity : FlutterActivity() {
                 }
             }
         } catch (e: Exception) { }
-        // Si no hay datos reales, retornar mock desde el lado nativo
         if (apps.isEmpty()) {
             val mockNames = listOf(
                 "YouTube", "WhatsApp", "Instagram", "Chrome", "Spotify",
@@ -706,26 +705,33 @@ class MainActivity : FlutterActivity() {
                 "org.telegram.messenger", "com.google.android.gm", "com.google.android.apps.maps",
                 "com.twitter.android"
             )
-            var accumulatedTime = 0L
+            var accumulatedTime: Long = 0
+            val mockApps = mutableListOf<Pair<Long, Map<String, Any>>>()
             for (i in 0 until 10) {
                 val usageSec = when (period) {
-                    "daily" -> (600 + (Math.random() * 3600).toInt())
-                    "weekly" -> (3600 + (Math.random() * 14400).toInt())
-                    else -> (600 + (Math.random() * 3600).toInt())
+                    "daily" -> (600 + (Math.random() * 3600).toLong())
+                    "weekly" -> (3600 + (Math.random() * 14400).toLong())
+                    else -> (600 + (Math.random() * 3600).toLong())
                 }
                 accumulatedTime += usageSec
-                apps.add(mapOf(
+                mockApps.add(Pair(usageSec, mapOf(
                     "name" to mockNames[i],
                     "packageName" to mockPkgs[i],
                     "usageTime" to usageSec,
-                    "batteryPercent" to 0, // se calcula después
+                    "batteryPercent" to 0,
                     "lastUsed" to System.currentTimeMillis() - (Math.random() * 3600000).toLong(),
-                ))
+                )))
             }
             val totalMock = accumulatedTime.coerceAtLeast(1)
-            for (app in apps) {
-                val time = (app["usageTime"] as? Long) ?: 0L
-                app["batteryPercent"] = ((time.toDouble() / totalMock) * 100).toInt().coerceAtLeast(1)
+            for ((time, m) in mockApps) {
+                val pct = ((time.toDouble() / totalMock) * 100).toInt().coerceAtLeast(1)
+                apps.add(mapOf(
+                    "name" to (m["name"] as String),
+                    "packageName" to (m["packageName"] as String),
+                    "usageTime" to time,
+                    "batteryPercent" to pct,
+                    "lastUsed" to (m["lastUsed"] as Long),
+                ))
             }
         }
         return apps
