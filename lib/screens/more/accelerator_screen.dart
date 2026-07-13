@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/constants.dart';
+import '../../core/theme_colors.dart';
 import '../../models/process_info.dart';
 import '../../providers/system_providers.dart';
 import '../../services/mock_service.dart';
@@ -144,13 +145,13 @@ class _AcceleratorScreenState extends ConsumerState<AcceleratorScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('Acelerar dispositivo', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+                        Text('Acelerar dispositivo', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: context.textPrimary)),
                         const SizedBox(height: 4),
                         Text(
                           ram != null
                               ? 'RAM: ${ram.usedFormatted} / ${ram.totalFormatted} (${ram.usagePercent}%)'
                               : 'Cargando...',
-                          style: const TextStyle(fontSize: 13, color: AppColors.textMuted),
+                          style: TextStyle(fontSize: 13, color: context.textMuted),
                         ),
                       ],
                     ),
@@ -169,7 +170,7 @@ class _AcceleratorScreenState extends ConsumerState<AcceleratorScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text('Memoria RAM', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white)),
+                        Text('Memoria RAM', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: context.textPrimary)),
                         Text(
                           '${ram.usagePercent}% usado',
                           style: TextStyle(
@@ -185,7 +186,7 @@ class _AcceleratorScreenState extends ConsumerState<AcceleratorScreen> {
                       child: LinearProgressIndicator(
                         value: ram.usagePercent / 100.0,
                         minHeight: 12,
-                        backgroundColor: Colors.white.withOpacity(0.05),
+                        backgroundColor: context.backgroundColor(0.05),
                         valueColor: AlwaysStoppedAnimation<Color>(
                           ram.usagePercent > 70 ? AppColors.warning : AppColors.success,
                         ),
@@ -195,8 +196,8 @@ class _AcceleratorScreenState extends ConsumerState<AcceleratorScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text('Usado: ${ram.usedFormatted}', style: const TextStyle(fontSize: 12, color: AppColors.textMuted)),
-                        Text('${killableProcesses.length} procesos cerrables', style: const TextStyle(fontSize: 12, color: AppColors.textMuted)),
+                        Text('Usado: ${ram.usedFormatted}', style: TextStyle(fontSize: 12, color: context.textMuted)),
+                        Text('${killableProcesses.length} procesos cerrables', style: TextStyle(fontSize: 12, color: context.textMuted)),
                       ],
                     ),
                   ],
@@ -216,20 +217,20 @@ class _AcceleratorScreenState extends ConsumerState<AcceleratorScreen> {
                         ),
                         const SizedBox(height: 12),
                         Text('Acelerando a fondo... $_killedSoFar procesos cerrados',
-                          style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600)),
+                          style: TextStyle(color: context.textPrimary, fontSize: 14, fontWeight: FontWeight.w600)),
                         const SizedBox(height: 8),
                         ClipRRect(
                           borderRadius: BorderRadius.circular(8),
                           child: LinearProgressIndicator(
                             value: _totalToKill > 0 ? (_killedSoFar / _totalToKill).clamp(0.0, 1.0) : 0,
                             minHeight: 6,
-                            backgroundColor: Colors.white.withOpacity(0.05),
+                            backgroundColor: context.backgroundColor(0.05),
                             valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primary),
                           ),
                         ),
                         const SizedBox(height: 4),
                         Text('$_killedSoFar / $_totalToKill procesos',
-                          style: const TextStyle(fontSize: 12, color: AppColors.textMuted)),
+                          style: TextStyle(fontSize: 12, color: context.textMuted)),
                       ],
                     ),
                   )
@@ -253,11 +254,11 @@ class _AcceleratorScreenState extends ConsumerState<AcceleratorScreen> {
                     children: [
                       const Icon(Icons.settings_applications, color: AppColors.info, size: 18),
                       const SizedBox(width: 8),
-                      const Expanded(
-                        child: Text('Procesos del sistema', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white)),
+                      Expanded(
+                        child: Text('Procesos del sistema', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: context.textPrimary)),
                       ),
                       if (!_loading)
-                        Text('${_processes.length} activos', style: const TextStyle(fontSize: 12, color: AppColors.textMuted)),
+                        Text('${_processes.length} activos', style: TextStyle(fontSize: 12, color: context.textMuted)),
                     ],
                   ),
                   const SizedBox(height: 12),
@@ -267,9 +268,9 @@ class _AcceleratorScreenState extends ConsumerState<AcceleratorScreen> {
                       child: CircularProgressIndicator(strokeWidth: 2),
                     ))
                   else if (_processes.isEmpty)
-                    const Padding(
-                      padding: EdgeInsets.all(20),
-                      child: Center(child: Text('No hay procesos disponibles', style: TextStyle(color: AppColors.textMuted))),
+                    Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: Center(child: Text('No hay procesos disponibles', style: TextStyle(color: context.textMuted))),
                     )
                   else
                     ..._processes.map((proc) => _processTile(proc)),
@@ -298,12 +299,12 @@ class _AcceleratorScreenState extends ConsumerState<AcceleratorScreen> {
             Container(
               width: 36, height: 36,
               decoration: BoxDecoration(
-                color: canKill ? AppColors.primary.withOpacity(0.15) : Colors.white.withOpacity(0.05),
+                color: canKill ? AppColors.primary.withOpacity(0.15) : context.backgroundColor(0.05),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(
                 proc.isSystem ? Icons.security : Icons.android,
-                color: canKill ? AppColors.primary : AppColors.textMuted,
+                color: canKill ? AppColors.primary : context.textMuted,
                 size: 18,
               ),
             ),
@@ -312,8 +313,8 @@ class _AcceleratorScreenState extends ConsumerState<AcceleratorScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(proc.name, style: TextStyle(color: canKill ? Colors.white : AppColors.textMuted, fontSize: 14, fontWeight: FontWeight.w500)),
-                  Text(proc.importanceLabel, style: const TextStyle(color: AppColors.textMuted, fontSize: 11)),
+                  Text(proc.name, style: TextStyle(color: canKill ? context.textPrimary : context.textMuted, fontSize: 14, fontWeight: FontWeight.w500)),
+                  Text(proc.importanceLabel, style: TextStyle(color: context.textMuted, fontSize: 11)),
                 ],
               ),
             ),

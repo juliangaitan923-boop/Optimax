@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/constants.dart';
+import '../../core/theme_colors.dart';
 import '../../core/utils.dart';
 import '../../providers/cleaner_provider.dart';
 import '../../widgets/glass_card.dart';
@@ -44,21 +45,21 @@ class _CleanerScreenState extends ConsumerState<CleanerScreen> {
             GlassCard(
               child: Column(
                 children: [
-                  const Row(
+                  Row(
                     children: [
-                      Icon(Icons.info_outline, color: AppColors.info, size: 20),
-                      SizedBox(width: 8),
+                      const Icon(Icons.info_outline, color: AppColors.info, size: 20),
+                      const SizedBox(width: 8),
                       Expanded(
                         child: Text(
                           'Escanea y elimina archivos innecesarios para liberar espacio y mejorar el rendimiento.',
-                          style: TextStyle(color: AppColors.textSecondary, fontSize: 13),
+                          style: TextStyle(color: context.textSecondary, fontSize: 13),
                         ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 16),
                   if (scanAsync.isLoading)
-                    const Column(
+                    Column(
                       children: [
                         SizedBox(
                           height: 40,
@@ -66,7 +67,7 @@ class _CleanerScreenState extends ConsumerState<CleanerScreen> {
                           child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primary),
                         ),
                         SizedBox(height: 8),
-                        Text('Escaneando...', style: TextStyle(color: AppColors.textMuted)),
+                        Text('Escaneando...', style: TextStyle(color: context.textMuted)),
                       ],
                     )
                   else
@@ -86,9 +87,9 @@ class _CleanerScreenState extends ConsumerState<CleanerScreen> {
                 children: [
                   Row(
                     children: [
-                      const Text('Archivos encontrados', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white)),
+                      Text('Archivos encontrados', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: context.textPrimary)),
                       const Spacer(),
-                      Text('${items.length} archivos', style: const TextStyle(color: AppColors.textMuted, fontSize: 13)),
+                      Text('${items.length} archivos', style: TextStyle(color: context.textMuted, fontSize: 13)),
                     ],
                   ),
                   const SizedBox(height: 12),
@@ -129,7 +130,7 @@ class _CleanerScreenState extends ConsumerState<CleanerScreen> {
                     children: [
                       const Icon(Icons.error_outline, color: AppColors.warning, size: 40),
                       const SizedBox(height: 8),
-                      Text('Error: $err', style: const TextStyle(color: AppColors.textMuted)),
+                      Text('Error: $err', style: TextStyle(color: context.textMuted)),
                       const SizedBox(height: 8),
                       TextButton(
                       onPressed: () {
@@ -180,16 +181,16 @@ class _CleanerScreenState extends ConsumerState<CleanerScreen> {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        backgroundColor: AppColors.surfaceCard,
+        backgroundColor: context.surfaceCard,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             const Icon(Icons.check_circle, color: AppColors.success, size: 56),
             const SizedBox(height: 16),
-            const Text('¡Limpieza completada!', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+            Text('¡Limpieza completada!', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: context.textPrimary)),
             const SizedBox(height: 12),
-            Text('Espacio liberado: ${formatBytes(freed)}', style: const TextStyle(fontSize: 14, color: AppColors.textSecondary)),
+            Text('Espacio liberado: ${formatBytes(freed)}', style: TextStyle(fontSize: 14, color: context.textSecondary)),
           ],
         ),
         actions: [
@@ -221,7 +222,7 @@ class _CleanupItemCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(14),
-        color: AppColors.surfaceCard,
+        color: context.surfaceCard,
         border: Border.all(
           color: isSelected ? AppColors.primary.withOpacity(0.5) : Colors.transparent,
         ),
@@ -250,17 +251,17 @@ class _CleanupItemCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(item.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500, fontSize: 14)),
+                      Text(item.name, style: TextStyle(color: context.textPrimary, fontWeight: FontWeight.w500, fontSize: 14)),
                       const SizedBox(height: 2),
-                      Text(item.category, style: const TextStyle(color: AppColors.textMuted, fontSize: 12)),
+                      Text(item.category, style: TextStyle(color: context.textMuted, fontSize: 12)),
                     ],
                   ),
                 ),
-                Text(item.sizeFormatted, style: const TextStyle(color: AppColors.textSecondary, fontWeight: FontWeight.w600, fontSize: 13)),
+                Text(item.sizeFormatted, style: TextStyle(color: context.textSecondary, fontWeight: FontWeight.w600, fontSize: 13)),
                 const SizedBox(width: 8),
                 Icon(
                   isSelected ? Icons.check_circle : Icons.radio_button_unchecked,
-                  color: isSelected ? AppColors.primary : AppColors.textMuted,
+                  color: isSelected ? AppColors.primary : context.textMuted,
                   size: 22,
                 ),
               ],
@@ -277,11 +278,11 @@ class _CleaningDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Dialog(
+    return Dialog(
       backgroundColor: Colors.transparent,
       child: GlassCard(
-        padding: EdgeInsets.all(32),
-        child: Column(
+        padding: const EdgeInsets.all(32),
+        child: const Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             SizedBox(
@@ -290,7 +291,7 @@ class _CleaningDialog extends StatelessWidget {
               child: CircularProgressIndicator(strokeWidth: 3, color: AppColors.secondary),
             ),
             SizedBox(height: 24),
-            Text('Limpiando archivos...', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600)),
+            Text('Limpiando archivos...', style: TextStyle(color: AppColors.textPrimary, fontSize: 18, fontWeight: FontWeight.w600)),
             SizedBox(height: 8),
             Text('Eliminando archivos innecesarios de forma segura', textAlign: TextAlign.center, style: TextStyle(color: AppColors.textSecondary, fontSize: 13)),
           ],

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/constants.dart';
+import '../../core/theme_colors.dart';
 import '../../providers/system_providers.dart';
 import '../../widgets/glass_card.dart';
 import '../../widgets/gradient_button.dart';
@@ -52,7 +53,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 gradient: LinearGradient(colors: [AppColors.primary, AppColors.secondary], begin: Alignment.topLeft, end: Alignment.bottomRight),
                 borderRadius: BorderRadius.all(Radius.circular(12)),
               ),
-              child: const Icon(Icons.speed, color: Colors.white, size: 20),
+              child: Icon(Icons.speed, color: context.textPrimary, size: 20),
             ),
             const SizedBox(width: 12),
             const Text('OptiMax', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 24, letterSpacing: -0.5)),
@@ -64,9 +65,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           Container(
             margin: const EdgeInsets.only(right: 4),
             decoration: BoxDecoration(
-              color: AppColors.surfaceCard.withOpacity(0.5),
+              color: context.surfaceCard.withOpacity(0.5),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppColors.surfaceCardBorder.withOpacity(0.3)),
+              border: Border.all(color: context.surfaceCardBorder.withOpacity(0.3)),
             ),
             child: IconButton(
               icon: const Icon(Icons.refresh_rounded),
@@ -77,7 +78,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 ref.invalidate(batteryInfoProvider);
                 ref.invalidate(healthScoreProvider);
               },
-              color: AppColors.textMuted,
+              color: context.textMuted,
               iconSize: 20,
             ),
           ),
@@ -101,7 +102,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               GlassCard(
                 child: Column(
                   children: [
-                    const Text(AppStrings.healthScore, style: TextStyle(color: AppColors.textSecondary, fontSize: 14)),
+                    Text(AppStrings.healthScore, style: TextStyle(color: context.textSecondary, fontSize: 14)),
                     const SizedBox(height: 12),
                     AnimatedCircularScore(score: healthScore),
                     const SizedBox(height: 12),
@@ -215,7 +216,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 child: TextButton.icon(
                   icon: const Icon(Icons.delete_outline, size: 16),
                   label: const Text('Limpiar historial de gráficos', style: TextStyle(fontSize: 12)),
-                  style: TextButton.styleFrom(foregroundColor: AppColors.textMuted),
+                  style: TextButton.styleFrom(foregroundColor: context.textMuted),
                   onPressed: () {
                     ref.read(historyServiceProvider).clear();
                     ref.invalidate(cpuInfoProvider);

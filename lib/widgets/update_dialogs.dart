@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../core/constants.dart';
+import '../core/theme_colors.dart';
 import '../services/update_service.dart';
 import 'glass_card.dart';
 
@@ -8,14 +9,14 @@ class UpdateCheckDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Dialog(
+    return Dialog(
       backgroundColor: Colors.transparent,
       child: GlassCard(
-        padding: EdgeInsets.all(32),
+        padding: const EdgeInsets.all(32),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            SizedBox(
+            const SizedBox(
               height: 50,
               width: 50,
               child: CircularProgressIndicator(
@@ -23,10 +24,10 @@ class UpdateCheckDialog extends StatelessWidget {
                 valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Text(
               'Buscando actualizaciones...',
-              style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
+              style: TextStyle(color: context.textPrimary, fontSize: 16, fontWeight: FontWeight.w500),
             ),
           ],
         ),
@@ -40,14 +41,14 @@ class UpdateProgressDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Dialog(
+    return Dialog(
       backgroundColor: Colors.transparent,
       child: GlassCard(
-        padding: EdgeInsets.all(32),
+        padding: const EdgeInsets.all(32),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            SizedBox(
+            const SizedBox(
               height: 50,
               width: 50,
               child: CircularProgressIndicator(
@@ -55,10 +56,10 @@ class UpdateProgressDialog extends StatelessWidget {
                 valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Text(
               'Descargando actualización...',
-              style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
+              style: TextStyle(color: context.textPrimary, fontSize: 16, fontWeight: FontWeight.w500),
             ),
           ],
         ),
@@ -82,15 +83,15 @@ class UpdateAvailableDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      backgroundColor: AppColors.surfaceCard,
+      backgroundColor: context.surfaceCard,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-      title: const Row(
+      title: Row(
         children: [
-          Icon(Icons.system_update, color: AppColors.primary, size: 28),
-          SizedBox(width: 12),
+          const Icon(Icons.system_update, color: AppColors.primary, size: 28),
+          const SizedBox(width: 12),
           Expanded(
             child: Text('Actualización disponible',
-              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              style: TextStyle(color: context.textPrimary, fontWeight: FontWeight.bold)),
           ),
         ],
       ),
@@ -105,7 +106,7 @@ class UpdateAvailableDialog extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             info.changelog,
-            style: const TextStyle(color: AppColors.textSecondary, fontSize: 13),
+            style: TextStyle(color: context.textSecondary, fontSize: 13),
           ),
         ],
       ),
@@ -116,11 +117,11 @@ class UpdateAvailableDialog extends StatelessWidget {
               Navigator.pop(context);
               onSkip!();
             },
-            child: const Text('Saltar versión', style: TextStyle(color: AppColors.textMuted)),
+            child: Text('Saltar versión', style: TextStyle(color: context.textMuted)),
           ),
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('Más tarde', style: TextStyle(color: AppColors.textMuted)),
+          child: Text('Más tarde', style: TextStyle(color: context.textMuted)),
         ),
         ElevatedButton(
           style: ElevatedButton.styleFrom(

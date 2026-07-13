@@ -1,0 +1,9 @@
+        Text(value, style: TextStyle(color: context.textPrimary, fontWeight: FontWeight.w600, fontSize: 14)),
+      ],
+    );
+  }
+  }
+
+
+class StepBoostOverlay extends StatefulWidget {
+  const StepBoostOverlay({super.key});

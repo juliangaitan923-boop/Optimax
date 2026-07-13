@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/constants.dart';
+import '../../core/theme_colors.dart';
 import '../../services/app_info.dart';
 import '../../widgets/glass_card.dart';
 import 'app_analyzer_screen.dart';
@@ -33,57 +34,57 @@ class MoreScreen extends ConsumerWidget {
         child: Column(
           children: [
             const SizedBox(height: 8),
-            GlassCard(
-              onTap: () => _navigate(context, const AcceleratorScreen()),
-              child: _menuItem(Icons.bolt, 'Acelerador', 'Libera RAM y cierra procesos innecesarios'),
-            ),
-            const SizedBox(height: 12),
-            GlassCard(
-              onTap: () => _navigate(context, const AppAnalyzerScreen()),
-              child: _menuItem(Icons.analytics, 'Analizador de Apps', 'Consumo, uso y rendimiento de aplicaciones'),
-            ),
-            const SizedBox(height: 12),
-            GlassCard(
-              onTap: () => _navigate(context, const CpuMonitorScreen()),
-              child: _menuItem(Icons.memory, 'Monitor de CPU y RAM', 'Gráficos en tiempo real de rendimiento'),
-            ),
-            const SizedBox(height: 12),
-            GlassCard(
-              onTap: () => _navigate(context, const StorageAnalyzerScreen()),
-              child: _menuItem(Icons.storage, 'Almacenamiento', 'Distribución y análisis de archivos'),
-            ),
-            const SizedBox(height: 12),
-            GlassCard(
-              onTap: () => _navigate(context, const GameOptimizerScreen()),
-              child: _menuItem(Icons.sports_esports, 'Optimizador de Juegos', 'Selecciona juegos y prioriza todo el hardware'),
-            ),
-            const SizedBox(height: 12),
-            GlassCard(
-              onTap: () => _navigate(context, const PerformanceProfilesScreen()),
-              child: _menuItem(Icons.tune, 'Perfiles de rendimiento', 'Normal · Ahorro · Gaming · Personalizado'),
-            ),
-            const SizedBox(height: 12),
-            GlassCard(
-              onTap: () => _navigate(context, const SettingsScreen()),
-              child: _menuItem(Icons.settings, 'Ajustes', 'Configuración de la app'),
-            ),
+              GlassCard(
+                  onTap: () => _navigate(context, const AcceleratorScreen()),
+                  child: _menuItem(context, Icons.bolt, 'Acelerador', 'Libera RAM y cierra procesos innecesarios'),
+                ),
+                const SizedBox(height: 12),
+                GlassCard(
+                  onTap: () => _navigate(context, const AppAnalyzerScreen()),
+                  child: _menuItem(context, Icons.analytics, 'Analizador de Apps', 'Consumo, uso y rendimiento de aplicaciones'),
+                ),
+                const SizedBox(height: 12),
+                GlassCard(
+                  onTap: () => _navigate(context, const CpuMonitorScreen()),
+                  child: _menuItem(context, Icons.memory, 'Monitor de CPU y RAM', 'Gráficos en tiempo real de rendimiento'),
+                ),
+                const SizedBox(height: 12),
+                GlassCard(
+                  onTap: () => _navigate(context, const StorageAnalyzerScreen()),
+                  child: _menuItem(context, Icons.storage, 'Almacenamiento', 'Distribución y análisis de archivos'),
+                ),
+                const SizedBox(height: 12),
+                GlassCard(
+                  onTap: () => _navigate(context, const GameOptimizerScreen()),
+                  child: _menuItem(context, Icons.sports_esports, 'Optimizador de Juegos', 'Selecciona juegos y prioriza todo el hardware'),
+                ),
+                const SizedBox(height: 12),
+                GlassCard(
+                  onTap: () => _navigate(context, const PerformanceProfilesScreen()),
+                  child: _menuItem(context, Icons.tune, 'Perfiles de rendimiento', 'Normal · Ahorro · Gaming · Personalizado'),
+                ),
+                const SizedBox(height: 12),
+                GlassCard(
+                  onTap: () => _navigate(context, const SettingsScreen()),
+                  child: _menuItem(context, Icons.settings, 'Ajustes', 'Configuración de la app'),
+                ),
             const SizedBox(height: 12),
             GlassCard(
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Row(
                   children: [
-                    const Icon(Icons.info_outline, color: AppColors.textMuted, size: 20),
+                    Icon(Icons.info_outline, color: context.textMuted, size: 20),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('OptiMax v${AppInfo.version}', style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w500)),
+                          Text('OptiMax v${AppInfo.version}', style: TextStyle(color: context.textPrimary, fontSize: 14, fontWeight: FontWeight.w500)),
                           const SizedBox(height: 2),
                           Text(
                             'Optimiza tu dispositivo sin modificarlo',
-                            style: TextStyle(color: AppColors.textMuted.withOpacity(0.7), fontSize: 12),
+                            style: TextStyle(color: context.textMuted.withOpacity(0.7), fontSize: 12),
                           ),
                         ],
                       ),
@@ -99,7 +100,7 @@ class MoreScreen extends ConsumerWidget {
     );
   }
 
-  Widget _menuItem(IconData icon, String title, String subtitle) {
+  Widget _menuItem(BuildContext context, IconData icon, String title, String subtitle) {
     return Row(
       children: [
         Container(
@@ -116,13 +117,13 @@ class MoreScreen extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(title, style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w500)),
+              Text(title, style: TextStyle(color: context.textPrimary, fontSize: 15, fontWeight: FontWeight.w500)),
               const SizedBox(height: 2),
-              Text(subtitle, style: const TextStyle(color: AppColors.textMuted, fontSize: 12)),
+              Text(subtitle, style: TextStyle(color: context.textMuted, fontSize: 12)),
             ],
           ),
         ),
-        const Icon(Icons.chevron_right, color: AppColors.textMuted, size: 20),
+        Icon(Icons.chevron_right, color: context.textMuted, size: 20),
       ],
     );
   }

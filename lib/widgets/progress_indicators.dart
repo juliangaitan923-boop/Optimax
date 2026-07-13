@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../core/constants.dart';
+import '../core/theme_colors.dart';
 
 class ShimmerLoading extends StatefulWidget {
   final double width;
@@ -49,9 +50,9 @@ class _ShimmerLoadingState extends State<ShimmerLoading>
             borderRadius: BorderRadius.circular(widget.borderRadius),
             gradient: LinearGradient(
               colors: [
-                AppColors.surfaceCard.withOpacity(0.3),
-                AppColors.surfaceCardLight.withOpacity(0.5),
-                AppColors.surfaceCard.withOpacity(0.3),
+                context.surfaceCard.withOpacity(0.3),
+                context.surfaceCardLight.withOpacity(0.5),
+                context.surfaceCard.withOpacity(0.3),
               ],
               stops: const [0.0, 0.5, 1.0],
               begin: Alignment(-1.0 + _controller.value * 2, 0),
@@ -76,7 +77,7 @@ class SkeletonCard extends StatelessWidget {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
-        color: AppColors.surfaceCard,
+        color: context.surfaceCard,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -169,7 +170,7 @@ class _AnimatedCircularScoreState extends State<AnimatedCircularScore>
                 child: CircularProgressIndicator(
                   value: widget.score / 100.0 * _animation.value,
                   strokeWidth: 10,
-                  backgroundColor: Colors.white.withOpacity(0.04),
+                  backgroundColor: context.backgroundColor(0.04),
                   valueColor: AlwaysStoppedAnimation<Color>(_scoreColor.withOpacity(0.8)),
                   strokeCap: StrokeCap.round,
                 ),
@@ -187,7 +188,7 @@ class _AnimatedCircularScoreState extends State<AnimatedCircularScore>
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
-                  border: Border.all(color: Colors.white.withOpacity(0.05)),
+                  border: Border.all(color: context.backgroundColor(0.05)),
                 ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -198,7 +199,7 @@ class _AnimatedCircularScoreState extends State<AnimatedCircularScore>
                       style: TextStyle(
                         fontSize: widget.size * 0.28,
                         fontWeight: FontWeight.w800,
-                        color: Colors.white,
+                        color: context.textPrimary,
                         letterSpacing: -1,
                       ),
                     ),
@@ -206,7 +207,7 @@ class _AnimatedCircularScoreState extends State<AnimatedCircularScore>
                       '/ 100',
                       style: TextStyle(
                         fontSize: widget.size * 0.09,
-                        color: AppColors.textMuted,
+                        color: context.textMuted,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -260,9 +261,9 @@ class ResourceBar extends StatelessWidget {
               child: Icon(icon, size: 16, color: _barColor),
             ),
             const SizedBox(width: 10),
-            Text(label, style: const TextStyle(color: AppColors.textSecondary, fontSize: 13, fontWeight: FontWeight.w500)),
+            Text(label, style: TextStyle(color: context.textSecondary, fontSize: 13, fontWeight: FontWeight.w500)),
             const Spacer(),
-            Text(value, style: const TextStyle(color: AppColors.textPrimary, fontSize: 13, fontWeight: FontWeight.w700)),
+            Text(value, style: TextStyle(color: context.textPrimary, fontSize: 13, fontWeight: FontWeight.w700)),
           ],
         ),
         const SizedBox(height: 10),
@@ -270,7 +271,7 @@ class ResourceBar extends StatelessWidget {
           borderRadius: BorderRadius.circular(6),
           child: LinearProgressIndicator(
             value: percent / 100.0,
-            backgroundColor: Colors.white.withOpacity(0.04),
+            backgroundColor: context.backgroundColor(0.04),
             valueColor: AlwaysStoppedAnimation<Color>(_barColor),
             minHeight: 7,
           ),

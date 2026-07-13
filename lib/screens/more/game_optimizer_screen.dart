@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/constants.dart';
+import '../../core/theme_colors.dart';
 import '../../providers/system_providers.dart';
 import '../../services/app_settings.dart';
 import '../../services/device_service.dart';
@@ -214,13 +215,13 @@ class _GameOptimizerScreenState extends ConsumerState<GameOptimizerScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: TextField(
               onChanged: _filterApps,
-              style: const TextStyle(color: Colors.white),
+              style: TextStyle(color: context.textPrimary),
               decoration: InputDecoration(
                 hintText: 'Buscar juegos...',
-                hintStyle: const TextStyle(color: AppColors.textMuted),
-                prefixIcon: const Icon(Icons.search, color: AppColors.textMuted),
+                hintStyle: TextStyle(color: context.textMuted),
+                prefixIcon: Icon(Icons.search, color: context.textMuted),
                 filled: true,
-                fillColor: AppColors.surfaceCard,
+                fillColor: context.surfaceCard,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(16),
                   borderSide: BorderSide.none,
@@ -233,8 +234,8 @@ class _GameOptimizerScreenState extends ConsumerState<GameOptimizerScreen> {
             child: _loading
                 ? const Center(child: CircularProgressIndicator(strokeWidth: 2))
                 : _filteredApps.isEmpty
-                    ? const Center(
-                        child: Text('No se encontraron aplicaciones', style: TextStyle(color: AppColors.textMuted)),
+                    ? Center(
+                        child: Text('No se encontraron aplicaciones', style: TextStyle(color: context.textMuted)),
                       )
                     : ListView.builder(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -286,12 +287,12 @@ class _GameOptimizerScreenState extends ConsumerState<GameOptimizerScreen> {
               children: [
                 Text(
                   'Optimizando: ${selectedName ?? _selectedGame ?? ''}',
-                  style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600),
+                  style: TextStyle(color: context.textPrimary, fontSize: 14, fontWeight: FontWeight.w600),
                 ),
                 const SizedBox(height: 2),
-                const Text(
+                Text(
                   'Rendimiento máximo activado',
-                  style: TextStyle(color: AppColors.textMuted, fontSize: 12),
+                  style: TextStyle(color: context.textMuted, fontSize: 12),
                 ),
               ],
             ),
@@ -332,12 +333,12 @@ class _GameOptimizerScreenState extends ConsumerState<GameOptimizerScreen> {
                   ),
                 ),
                 const SizedBox(width: 12),
-                const Expanded(
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Modo Extremo', style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold)),
-                      Text('Desactiva todo mientras juegas, al salir se restaura solo', style: TextStyle(color: AppColors.textMuted, fontSize: 11)),
+                      Text('Modo Extremo', style: TextStyle(color: context.textPrimary, fontSize: 15, fontWeight: FontWeight.bold)),
+                      Text('Desactiva todo mientras juegas, al salir se restaura solo', style: TextStyle(color: context.textMuted, fontSize: 11)),
                     ],
                   ),
                 ),
@@ -353,7 +354,7 @@ class _GameOptimizerScreenState extends ConsumerState<GameOptimizerScreen> {
               ],
             ),
             if (_extremeMode) ...[
-              const Divider(color: Colors.white10, height: 20),
+              Divider(color: context.dividerColor, height: 20),
               Row(
                 children: [
                   const Icon(Icons.close, color: AppColors.warning, size: 16),
@@ -394,12 +395,12 @@ class _GameOptimizerScreenState extends ConsumerState<GameOptimizerScreen> {
               decoration: BoxDecoration(
                 color: isGame
                     ? AppColors.primary.withOpacity(0.2)
-                    : Colors.white.withOpacity(0.05),
+                    : context.backgroundColor(0.05),
                 borderRadius: BorderRadius.circular(14),
               ),
               child: Icon(
                 isGame ? Icons.sports_esports : Icons.android,
-                color: isGame ? AppColors.primary : AppColors.textMuted,
+                color: isGame ? AppColors.primary : context.textMuted,
                 size: 22,
               ),
             ),
@@ -411,7 +412,7 @@ class _GameOptimizerScreenState extends ConsumerState<GameOptimizerScreen> {
                   Text(
                     name,
                     style: TextStyle(
-                      color: selected ? AppColors.primary : Colors.white,
+                      color: selected ? AppColors.primary : context.textPrimary,
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
                     ),
@@ -444,7 +445,7 @@ class _GameOptimizerScreenState extends ConsumerState<GameOptimizerScreen> {
                 child: ElevatedButton(
                   onPressed: () => _prioritizeGame(app),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: isGame ? AppColors.primary : AppColors.surfaceCardLight,
+                    backgroundColor: isGame ? AppColors.primary : context.surfaceCardLight,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(horizontal: 14),
                     shape: RoundedRectangleBorder(

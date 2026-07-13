@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../core/constants.dart';
+import '../core/theme_colors.dart';
 
 class GlassCard extends StatelessWidget {
   final Widget child;
@@ -19,21 +20,15 @@ class GlassCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = context;
     return Container(
       height: height,
       width: width,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            AppColors.surfaceCard.withOpacity(0.85),
-            AppColors.surfaceCardLight.withOpacity(0.7),
-          ],
-        ),
+        color: c.surfaceCard.withOpacity(c.isDark ? 0.85 : 0.95),
         border: Border.all(
-          color: Colors.white.withOpacity(0.06),
+          color: c.surfaceCardBorder.withOpacity(0.3),
         ),
         boxShadow: [
           BoxShadow(
@@ -42,7 +37,7 @@ class GlassCard extends StatelessWidget {
             offset: const Offset(0, 8),
           ),
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
+            color: c.backgroundColor(0.08),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),

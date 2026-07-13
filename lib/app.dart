@@ -157,6 +157,7 @@ class _MainShellState extends ConsumerState<MainShell> {
   Widget build(BuildContext context) {
     final currentIndex = ref.watch(tabIndexProvider);
     final safeIndex = currentIndex.clamp(0, _screens.length - 1);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       body: AnimatedSwitcher(
         duration: const Duration(milliseconds: 300),
@@ -171,16 +172,15 @@ class _MainShellState extends ConsumerState<MainShell> {
         margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(28),
-          gradient: LinearGradient(
-            colors: [
-              AppColors.surfaceCard.withOpacity(0.92),
-              AppColors.surfaceDark.withOpacity(0.88),
-            ],
+          color: isDark ? AppColors.surfaceCard.withOpacity(0.92) : Colors.white,
+          border: Border.all(
+            color: isDark
+                ? AppColors.surfaceCardBorder.withOpacity(0.3)
+                : AppColors.lightBorder.withOpacity(0.5),
           ),
-          border: Border.all(color: AppColors.surfaceCardBorder.withOpacity(0.3)),
           boxShadow: [
             BoxShadow(
-              color: AppTheme.primary.withOpacity(0.15),
+              color: (isDark ? AppTheme.primary : Colors.black).withOpacity(isDark ? 0.15 : 0.08),
               blurRadius: 30,
               offset: const Offset(0, 8),
             ),
@@ -194,14 +194,14 @@ class _MainShellState extends ConsumerState<MainShell> {
             elevation: 0,
             backgroundColor: Colors.transparent,
             selectedItemColor: AppTheme.primary,
-            unselectedItemColor: AppTheme.textMuted,
+            unselectedItemColor: isDark ? AppTheme.textMuted : AppColors.lightTextSecondary,
             type: BottomNavigationBarType.fixed,
             selectedFontSize: 11,
             unselectedFontSize: 11,
             items: List.generate(4, (i) {
               return BottomNavigationBarItem(
-                icon: _NavIcon(i, isSelected: false),
-                activeIcon: _NavIcon(i, isSelected: true),
+                icon: _NavIcon(i, isSelected: false, isDark: isDark),
+                activeIcon: _NavIcon(i, isSelected: true, isDark: isDark),
                 label: _navLabels[i],
               );
             }),
@@ -224,7 +224,9 @@ const _navLabels = ['Dashboard', 'Limpiar', 'Batería', 'Más'];
 class _NavIcon extends StatelessWidget {
   final int index;
   final bool isSelected;
-  const _NavIcon(this.index, {super.key, required this.isSelected});
+  final bool isDark;
+
+  const _NavIcon(this.index, {super.key, required this.isSelected, required this.isDark});
 
   @override
   Widget build(BuildContext context) {
@@ -250,7 +252,7 @@ class _NavIcon extends StatelessWidget {
       child: Icon(
         _navIcons[index],
         size: 22,
-        color: isSelected ? Colors.white : null,
+        color: isSelected ? Colors.white : (isDark ? AppColors.textMuted : AppColors.lightTextSecondary),
       ),
     );
   }

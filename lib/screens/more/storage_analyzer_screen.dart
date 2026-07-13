@@ -2,6 +2,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/constants.dart';
+import '../../core/theme_colors.dart';
 import '../../providers/system_providers.dart';
 import '../../services/storage_analyzer_service.dart';
 import '../../widgets/glass_card.dart';
@@ -42,7 +43,7 @@ class _StorageAnalyzerScreenState extends ConsumerState<StorageAnalyzerScreen> {
         elevation: 0,
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh, color: AppColors.textMuted),
+            icon: Icon(Icons.refresh, color: context.textMuted),
             onPressed: _load,
           ),
         ],
@@ -77,9 +78,9 @@ class _StorageAnalyzerScreenState extends ConsumerState<StorageAnalyzerScreen> {
                               ),
                               const SizedBox(width: 10),
                               Expanded(
-                                child: Text(cat.name, style: const TextStyle(color: Colors.white, fontSize: 13)),
+                                child: Text(cat.name, style: TextStyle(color: context.textPrimary, fontSize: 13)),
                               ),
-                              Text(cat.sizeFormatted, style: const TextStyle(color: AppColors.textSecondary, fontSize: 13)),
+                              Text(cat.sizeFormatted, style: TextStyle(color: context.textSecondary, fontSize: 13)),
                             ],
                           ),
                         )),
@@ -92,11 +93,11 @@ class _StorageAnalyzerScreenState extends ConsumerState<StorageAnalyzerScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Row(
+                        Row(
                           children: [
-                            Icon(Icons.lightbulb_outline, color: AppColors.warning, size: 18),
-                            SizedBox(width: 8),
-                            Text('Recomendaciones', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white)),
+                            const Icon(Icons.lightbulb_outline, color: AppColors.warning, size: 18),
+                            const SizedBox(width: 8),
+                            Text('Recomendaciones', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: context.textPrimary)),
                           ],
                         ),
                         const SizedBox(height: 12),
@@ -133,7 +134,7 @@ class _StorageAnalyzerScreenState extends ConsumerState<StorageAnalyzerScreen> {
                   value: percent,
                   title: '${percent.toStringAsFixed(0)}%',
                   radius: 50,
-                  titleStyle: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.white),
+                  titleStyle: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: context.textPrimary),
                 );
               }).toList(),
               sectionsSpace: 2,
@@ -144,9 +145,9 @@ class _StorageAnalyzerScreenState extends ConsumerState<StorageAnalyzerScreen> {
         Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text('Total', style: TextStyle(color: AppColors.textMuted, fontSize: 12)),
+            Text('Total', style: TextStyle(color: context.textMuted, fontSize: 12)),
             const SizedBox(height: 4),
-            Text(_formatTotalSize(), style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
+            Text(_formatTotalSize(), style: TextStyle(color: context.textPrimary, fontSize: 20, fontWeight: FontWeight.bold)),
           ],
         ),
       ],
@@ -159,7 +160,7 @@ class _StorageAnalyzerScreenState extends ConsumerState<StorageAnalyzerScreen> {
         Icon(icon, color: AppColors.info, size: 18),
         const SizedBox(width: 10),
         Expanded(
-          child: Text(text, style: const TextStyle(color: AppColors.textSecondary, fontSize: 13)),
+          child: Text(text, style: TextStyle(color: context.textSecondary, fontSize: 13)),
         ),
       ],
     );

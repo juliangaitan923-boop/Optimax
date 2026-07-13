@@ -2,6 +2,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/constants.dart';
+import '../../core/theme_colors.dart';
 import '../../providers/system_providers.dart';
 import '../../widgets/glass_card.dart';
 import '../../widgets/history_chart.dart';
@@ -45,19 +46,19 @@ class CpuMonitorScreen extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Row(
+                  Row(
                     children: [
-                      Icon(Icons.memory, color: AppColors.primary, size: 22),
-                      SizedBox(width: 8),
-                      Text('CPU', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+                      const Icon(Icons.memory, color: AppColors.primary, size: 22),
+                      const SizedBox(width: 8),
+                      Text('CPU', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: context.textPrimary)),
                     ],
                   ),
                   const SizedBox(height: 16),
                   Row(
                     children: [
-                      _metricTile('Uso', '${cpu?.usagePercent ?? 0}%', AppColors.primary),
-                      _metricTile('Temp', cpu?.tempFormatted ?? '--', AppColors.warning),
-                      _metricTile('Frec', cpu?.freqFormatted ?? '--', AppColors.info),
+                      _metricTile(context, 'Uso', '${cpu?.usagePercent ?? 0}%', AppColors.primary),
+                      _metricTile(context, 'Temp', cpu?.tempFormatted ?? '--', AppColors.warning),
+                      _metricTile(context, 'Frec', cpu?.freqFormatted ?? '--', AppColors.info),
                     ],
                   ),
                   const SizedBox(height: 16),
@@ -82,19 +83,19 @@ class CpuMonitorScreen extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Row(
+                  Row(
                     children: [
-                      Icon(Icons.data_usage, color: AppColors.secondary, size: 22),
-                      SizedBox(width: 8),
-                      Text('RAM', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+                      const Icon(Icons.data_usage, color: AppColors.secondary, size: 22),
+                      const SizedBox(width: 8),
+                      Text('RAM', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: context.textPrimary)),
                     ],
                   ),
                   const SizedBox(height: 16),
                   Row(
                     children: [
-                      _metricTile('Uso', '${ram?.usagePercent ?? 0}%', AppColors.secondary),
-                      _metricTile('Usado', ram?.usedFormatted ?? '--', AppColors.warning),
-                      _metricTile('Disponible', ram?.availableFormatted ?? '--', AppColors.info),
+                      _metricTile(context, 'Uso', '${ram?.usagePercent ?? 0}%', AppColors.secondary),
+                      _metricTile(context, 'Usado', ram?.usedFormatted ?? '--', AppColors.warning),
+                      _metricTile(context, 'Disponible', ram?.availableFormatted ?? '--', AppColors.info),
                     ],
                   ),
                   const SizedBox(height: 16),
@@ -119,11 +120,11 @@ class CpuMonitorScreen extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Row(
+                  Row(
                     children: [
-                      Icon(Icons.apps, color: AppColors.info, size: 18),
-                      SizedBox(width: 8),
-                      Text('Apps con mayor consumo', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white)),
+                      const Icon(Icons.apps, color: AppColors.info, size: 18),
+                      const SizedBox(width: 8),
+                      Text('Apps con mayor consumo', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: context.textPrimary)),
                     ],
                   ),
                   const SizedBox(height: 12),
@@ -144,18 +145,18 @@ class CpuMonitorScreen extends ConsumerWidget {
                             ),
                             const SizedBox(width: 10),
                             Expanded(
-                              child: Text(app['name'] as String? ?? '', style: const TextStyle(color: Colors.white, fontSize: 13)),
+                              child: Text(app['name'] as String? ?? '', style: TextStyle(color: context.textPrimary, fontSize: 13)),
                             ),
                             Text(
                               _formatDuration((app['usageTime'] as int?) ?? 0),
-                              style: const TextStyle(color: AppColors.textMuted, fontSize: 12),
+                              style: TextStyle(color: context.textMuted, fontSize: 12),
                             ),
                           ],
                         ),
                       )).toList(),
                     ),
                     loading: () => const Center(child: CircularProgressIndicator(strokeWidth: 2)),
-                    error: (_, __) => const Text('No disponible', style: TextStyle(color: AppColors.textMuted)),
+                    error: (_, __) => Text('No disponible', style: TextStyle(color: context.textMuted)),
                   ),
                 ],
               ),
@@ -167,13 +168,13 @@ class CpuMonitorScreen extends ConsumerWidget {
     );
   }
 
-  Widget _metricTile(String label, String value, Color color) {
+  Widget _metricTile(BuildContext context, String label, String value, Color color) {
     return Expanded(
       child: Column(
         children: [
           Text(value, style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: color)),
           const SizedBox(height: 4),
-          Text(label, style: const TextStyle(fontSize: 12, color: AppColors.textMuted)),
+          Text(label, style: TextStyle(fontSize: 12, color: context.textMuted)),
         ],
       ),
     );

@@ -2,6 +2,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/constants.dart';
+import '../../core/theme_colors.dart';
 import '../../providers/system_providers.dart';
 import '../../widgets/glass_card.dart';
 import '../../widgets/history_chart.dart';
@@ -61,7 +62,7 @@ class _BatteryScreenState extends ConsumerState<BatteryScreen> {
                           child: CircularProgressIndicator(
                             value: (battery?.percent ?? 0) / 100.0,
                             strokeWidth: 10,
-                            backgroundColor: Colors.white.withOpacity(0.05),
+                            backgroundColor: context.backgroundColor(0.05),
                             valueColor: AlwaysStoppedAnimation<Color>(
                               battery != null && battery.percent > 20
                                   ? AppColors.success : AppColors.warning,
@@ -72,9 +73,9 @@ class _BatteryScreenState extends ConsumerState<BatteryScreen> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text('${battery?.percent ?? 0}%',
-                              style: const TextStyle(fontSize: 36, fontWeight: FontWeight.bold, color: Colors.white)),
+                              style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold, color: context.textPrimary)),
                             Text(battery?.isCharging == true ? 'Cargando' : 'Descargando',
-                              style: const TextStyle(color: AppColors.textMuted, fontSize: 13)),
+                              style: TextStyle(color: context.textMuted, fontSize: 13)),
                           ],
                         ),
                       ],
@@ -95,12 +96,12 @@ class _BatteryScreenState extends ConsumerState<BatteryScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Row(
+                  Row(
                     children: [
-                      Icon(Icons.timeline, color: AppColors.primary, size: 18),
-                      SizedBox(width: 8),
+                      const Icon(Icons.timeline, color: AppColors.primary, size: 18),
+                      const SizedBox(width: 8),
                       Text('Historial de batería',
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white)),
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: context.textPrimary)),
                     ],
                   ),
                   const SizedBox(height: 12),
@@ -124,17 +125,17 @@ class _BatteryScreenState extends ConsumerState<BatteryScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Recomendaciones',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white)),
+                  Text('Recomendaciones',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: context.textPrimary)),
                   const SizedBox(height: 12),
                   _suggestionTile(Icons.brightness_low, 'Reducir brillo de pantalla',
                     'La pantalla consume hasta el 40% de la batería',
                     () => _openSetting(context, ref, 'display')),
-                  const Divider(color: Colors.white10, height: 20),
+                  Divider(color: context.dividerColor, height: 20),
                   _suggestionTile(Icons.wifi_off, 'Desactivar WiFi/BT no usados',
                     'Las conexiones activas consumen batería en segundo plano',
                     () => _openSetting(context, ref, 'wifi')),
-                  const Divider(color: Colors.white10, height: 20),
+                  Divider(color: context.dividerColor, height: 20),
                   _suggestionTile(Icons.power_settings_new, 'Activar ahorro de energía',
                     'Limita procesos en segundo plano para extender batería',
                     () => _openSetting(context, ref, 'battery_saver')),
@@ -149,12 +150,12 @@ class _BatteryScreenState extends ConsumerState<BatteryScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Row(
+                  Row(
                     children: [
-                      Icon(Icons.battery_charging_full, color: AppColors.warning, size: 18),
-                      SizedBox(width: 8),
+                      const Icon(Icons.battery_charging_full, color: AppColors.warning, size: 18),
+                      const SizedBox(width: 8),
                       Text('Apps con más consumo de batería',
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white)),
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: context.textPrimary)),
                     ],
                   ),
                   const SizedBox(height: 12),
@@ -162,7 +163,7 @@ class _BatteryScreenState extends ConsumerState<BatteryScreen> {
                   // Tabs
                   Container(
                     decoration: BoxDecoration(
-                      color: AppColors.surfaceCardLight.withOpacity(0.5),
+                      color: context.surfaceCardLight.withOpacity(0.5),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Row(
@@ -177,9 +178,9 @@ class _BatteryScreenState extends ConsumerState<BatteryScreen> {
                   batteryUsageAsync.when(
                     data: (apps) {
                       if (apps.isEmpty) {
-                        return const Padding(
-                          padding: EdgeInsets.all(12),
-                          child: Center(child: Text('Sin datos de uso', style: TextStyle(color: AppColors.textMuted))),
+                        return Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: Center(child: Text('Sin datos de uso', style: TextStyle(color: context.textMuted))),
                         );
                       }
                       return Column(
@@ -198,7 +199,7 @@ class _BatteryScreenState extends ConsumerState<BatteryScreen> {
                                   child: Text('$rank',
                                     style: TextStyle(
                                       fontSize: 12, fontWeight: FontWeight.bold,
-                                      color: rank <= 3 ? AppColors.warning : AppColors.textMuted,
+                                      color: rank <= 3 ? AppColors.warning : context.textMuted,
                                     )),
                                 ),
                                 const SizedBox(width: 8),
@@ -219,7 +220,7 @@ class _BatteryScreenState extends ConsumerState<BatteryScreen> {
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(name,
-                                        style: const TextStyle(color: Colors.white, fontSize: 14),
+                                        style: TextStyle(color: context.textPrimary, fontSize: 14),
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                       const SizedBox(height: 2),
@@ -228,7 +229,7 @@ class _BatteryScreenState extends ConsumerState<BatteryScreen> {
                                         child: LinearProgressIndicator(
                                           value: batteryPercent / 100.0,
                                           minHeight: 3,
-                                          backgroundColor: Colors.white.withOpacity(0.08),
+                                          backgroundColor: context.backgroundColor(0.08),
                                           valueColor: AlwaysStoppedAnimation<Color>(
                                             batteryPercent > 30 ? AppColors.warning : AppColors.primary,
                                           ),
@@ -241,11 +242,11 @@ class _BatteryScreenState extends ConsumerState<BatteryScreen> {
                                 Text('$batteryPercent%',
                                   style: TextStyle(
                                     fontSize: 12, fontWeight: FontWeight.bold,
-                                    color: batteryPercent > 30 ? AppColors.warning : Colors.white,
+                                    color: batteryPercent > 30 ? AppColors.warning : context.textPrimary,
                                   )),
                                 const SizedBox(width: 8),
                                 Text(_formatDuration(usageTime),
-                                  style: const TextStyle(fontSize: 11, color: AppColors.textMuted)),
+                                  style: TextStyle(fontSize: 11, color: context.textMuted)),
                               ],
                             ),
                           );
@@ -256,9 +257,9 @@ class _BatteryScreenState extends ConsumerState<BatteryScreen> {
                       padding: EdgeInsets.all(20),
                       child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
                     ),
-                    error: (_, __) => const Padding(
-                      padding: EdgeInsets.all(12),
-                      child: Center(child: Text('No disponible', style: TextStyle(color: AppColors.textMuted))),
+                    error: (_, __) => Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: Center(child: Text('No disponible', style: TextStyle(color: context.textMuted))),
                     ),
                   ),
                 ],
@@ -285,7 +286,7 @@ class _BatteryScreenState extends ConsumerState<BatteryScreen> {
           child: Center(
             child: Text(label,
               style: TextStyle(
-                color: selected ? Colors.white : AppColors.textMuted,
+                color: selected ? context.textPrimary : context.textMuted,
                 fontSize: 13, fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
               ),
             ),
@@ -301,8 +302,8 @@ class _BatteryScreenState extends ConsumerState<BatteryScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: const TextStyle(color: AppColors.textSecondary, fontSize: 14)),
-          Text(value, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500, fontSize: 14)),
+          Text(label, style: TextStyle(color: context.textSecondary, fontSize: 14)),
+          Text(value, style: TextStyle(color: context.textPrimary, fontWeight: FontWeight.w500, fontSize: 14)),
         ],
       ),
     );
@@ -322,12 +323,12 @@ class _BatteryScreenState extends ConsumerState<BatteryScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title, style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w500)),
-                  Text(subtitle, style: const TextStyle(color: AppColors.textMuted, fontSize: 12)),
+                  Text(title, style: TextStyle(color: context.textPrimary, fontSize: 14, fontWeight: FontWeight.w500)),
+                  Text(subtitle, style: TextStyle(color: context.textMuted, fontSize: 12)),
                 ],
               ),
             ),
-            const Icon(Icons.chevron_right, color: AppColors.textMuted, size: 18),
+            Icon(Icons.chevron_right, color: context.textMuted, size: 18),
           ],
         ),
       ),

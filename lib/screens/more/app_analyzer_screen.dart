@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/constants.dart';
+import '../../core/theme_colors.dart';
 import '../../providers/system_providers.dart';
 import '../../widgets/glass_card.dart';
 
@@ -29,11 +30,11 @@ class AppAnalyzerScreen extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Row(
+                  Row(
                     children: [
-                      Icon(Icons.timeline, color: AppColors.primary, size: 18),
-                      SizedBox(width: 8),
-                      Text('Apps más usadas', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white)),
+                      const Icon(Icons.timeline, color: AppColors.primary, size: 18),
+                      const SizedBox(width: 8),
+                      Text('Apps más usadas', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: context.textPrimary)),
                     ],
                   ),
                   const SizedBox(height: 12),
@@ -47,45 +48,45 @@ class AppAnalyzerScreen extends ConsumerWidget {
                           child: Row(
                             children: [
                               Container(
-                                width: 24,
-                                height: 24,
-                                decoration: BoxDecoration(
-                                  color: rank <= 3 ? AppColors.primary.withOpacity(0.2) : Colors.transparent,
-                                  borderRadius: BorderRadius.circular(8),
+                                  width: 24,
+                                  height: 24,
+                                  decoration: BoxDecoration(
+                                    color: rank <= 3 ? AppColors.primary.withOpacity(0.2) : Colors.transparent,
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Center(
+                                    child: Text('$rank', style: TextStyle(
+                                      color: rank <= 3 ? AppColors.primary : context.textMuted,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 12,
+                                    )),
+                                  ),
                                 ),
-                                child: Center(
-                                  child: Text('$rank', style: TextStyle(
-                                    color: rank <= 3 ? AppColors.primary : AppColors.textMuted,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 12,
-                                  )),
+                                const SizedBox(width: 12),
+                                Container(
+                                  width: 36,
+                                  height: 36,
+                                  decoration: BoxDecoration(
+                                    color: context.surfaceCardLight,
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Icon(Icons.android, color: context.textMuted, size: 18),
                                 ),
-                              ),
-                              const SizedBox(width: 12),
-                              Container(
-                                width: 36,
-                                height: 36,
-                                decoration: BoxDecoration(
-                                  color: AppColors.surfaceCardLight,
-                                  borderRadius: BorderRadius.circular(10),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Text(app['name'] as String? ?? '', style: TextStyle(color: context.textPrimary, fontSize: 14)),
                                 ),
-                                child: const Icon(Icons.android, color: AppColors.textMuted, size: 18),
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Text(app['name'] as String? ?? '', style: const TextStyle(color: Colors.white, fontSize: 14)),
-                              ),
-                              Text(
-                                _formatDuration((app['usageTime'] as int?) ?? 0),
-                                style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
-                              ),
+                                Text(
+                                  _formatDuration((app['usageTime'] as int?) ?? 0),
+                                  style: TextStyle(color: context.textSecondary, fontSize: 12),
+                                ),
                             ],
                           ),
                         );
                       }).toList(),
                     ),
                     loading: () => const Center(child: CircularProgressIndicator(strokeWidth: 2)),
-                    error: (_, __) => const Text('No disponible', style: TextStyle(color: AppColors.textMuted)),
+                    error: (_, __) => Text('No disponible', style: TextStyle(color: context.textMuted)),
                   ),
                 ],
               ),
@@ -96,18 +97,18 @@ class AppAnalyzerScreen extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Row(
+                  Row(
                     children: [
-                      Icon(Icons.settings_applications, color: AppColors.info, size: 18),
-                      SizedBox(width: 8),
-                      Text('Procesos activos', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white)),
+                      const Icon(Icons.settings_applications, color: AppColors.info, size: 18),
+                      const SizedBox(width: 8),
+                      Text('Procesos activos', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: context.textPrimary)),
                     ],
                   ),
                   const SizedBox(height: 12),
                   processesAsync.when(
                     data: (processes) {
                       if (processes.isEmpty) {
-                        return const Text('Sin datos', style: TextStyle(color: AppColors.textMuted));
+                        return Text('Sin datos', style: TextStyle(color: context.textMuted));
                       }
                       return Column(
                         children: processes.map((p) => Padding(
@@ -124,18 +125,18 @@ class AppAnalyzerScreen extends ConsumerWidget {
                               ),
                               const SizedBox(width: 10),
                               Expanded(
-                                child: Text(p.name, style: const TextStyle(color: Colors.white, fontSize: 13)),
+                                child: Text(p.name, style: TextStyle(color: context.textPrimary, fontSize: 13)),
                               ),
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                                 decoration: BoxDecoration(
-                                  color: AppColors.surfaceCardLight,
+                                  color: context.surfaceCardLight,
                                   borderRadius: BorderRadius.circular(6),
                                 ),
                                 child: Text(
                                   p.importanceLabel,
                                   style: TextStyle(
-                                    color: p.isSystem ? AppColors.warning : AppColors.textMuted,
+                                    color: p.isSystem ? AppColors.warning : context.textMuted,
                                     fontSize: 11,
                                   ),
                                 ),
@@ -146,7 +147,7 @@ class AppAnalyzerScreen extends ConsumerWidget {
                       );
                     },
                     loading: () => const Center(child: CircularProgressIndicator(strokeWidth: 2)),
-                    error: (_, __) => const Text('No disponible', style: TextStyle(color: AppColors.textMuted)),
+                    error: (_, __) => Text('No disponible', style: TextStyle(color: context.textMuted)),
                   ),
                 ],
               ),

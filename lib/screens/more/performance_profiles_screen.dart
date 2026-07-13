@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/constants.dart';
+import '../../core/theme_colors.dart';
 import '../../providers/system_providers.dart';
 import '../../services/app_settings.dart';
 
@@ -30,10 +31,10 @@ class PerformanceProfilesScreen extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 8),
-            const Text(
+            Text(
               'Selecciona un perfil',
               style: TextStyle(
-                color: AppColors.textSecondary,
+                color: context.textSecondary,
                 fontSize: 14,
               ),
             ),
@@ -90,8 +91,8 @@ class _ProfileCard extends StatelessWidget {
           border: Border.all(color: borderColor, width: 1.5),
           gradient: LinearGradient(
             colors: [
-              AppColors.surfaceCard,
-              AppColors.surfaceCard.withOpacity(0.8),
+              context.surfaceCard,
+              context.surfaceCard.withOpacity(0.8),
             ],
           ),
         ),
@@ -122,7 +123,7 @@ class _ProfileCard extends StatelessWidget {
                     Text(
                       data.name,
                       style: TextStyle(
-                        color: isSelected ? AppColors.primary : Colors.white,
+                        color: isSelected ? AppColors.primary : context.textPrimary,
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                       ),
@@ -130,8 +131,8 @@ class _ProfileCard extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       data.description,
-                      style: const TextStyle(
-                        color: AppColors.textMuted,
+                      style: TextStyle(
+                        color: context.textMuted,
                         fontSize: 13,
                       ),
                     ),

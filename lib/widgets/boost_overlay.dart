@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import '../core/constants.dart';
+import '../core/theme_colors.dart';
 import '../core/utils.dart';
 
 class BoostOverlay extends StatelessWidget {
@@ -22,16 +23,16 @@ class BoostOverlay extends StatelessWidget {
           children: [
             const Icon(Icons.check_circle, color: AppColors.success, size: 64),
             const SizedBox(height: 16),
-            const Text(
+            Text(
               '¡Optimización completada!',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: context.textPrimary),
             ),
             const SizedBox(height: 24),
-            _buildResultRow(Icons.memory, 'RAM liberada', formatBytes(ramFreed)),
+            _buildResultRow(context, Icons.memory, 'RAM liberada', formatBytes(ramFreed)),
             const SizedBox(height: 12),
-            _buildResultRow(Icons.cleaning_services, 'Caché limpiada', formatBytes(cacheFreed)),
+            _buildResultRow(context, Icons.cleaning_services, 'Caché limpiada', formatBytes(cacheFreed)),
             const SizedBox(height: 12),
-            _buildResultRow(Icons.close, 'Procesos cerrados', '$processesKilled'),
+            _buildResultRow(context, Icons.close, 'Procesos cerrados', '$processesKilled'),
             const SizedBox(height: 24),
           ],
         ),
@@ -39,19 +40,18 @@ class BoostOverlay extends StatelessWidget {
     );
   }
 
-  Widget _buildResultRow(IconData icon, String label, String value) {
+  Widget _buildResultRow(BuildContext context, IconData icon, String label, String value) {
     return Row(
       children: [
         Icon(icon, color: AppColors.primary, size: 20),
         const SizedBox(width: 12),
-        Text(label, style: const TextStyle(color: AppColors.textSecondary, fontSize: 14)),
+        Text(label, style: TextStyle(color: context.textSecondary, fontSize: 14)),
         const Spacer(),
-        Text(value, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 14)),
+        Text(value, style: TextStyle(color: context.textPrimary, fontWeight: FontWeight.w600, fontSize: 14)),
       ],
     );
   }
-  }
-
+}
 
 class StepBoostOverlay extends StatefulWidget {
   const StepBoostOverlay({super.key});
@@ -108,7 +108,7 @@ class _StepBoostOverlayState extends State<StepBoostOverlay> {
             const SizedBox(height: 20),
             Text(
               _steps[_currentStep].$1,
-              style: const TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w600),
+              style: TextStyle(color: context.textPrimary, fontSize: 17, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 20),
             ..._steps.asMap().entries.map((entry) {
@@ -122,16 +122,16 @@ class _StepBoostOverlayState extends State<StepBoostOverlay> {
                   children: [
                     Icon(
                       isDone ? Icons.check_circle : isCurrent ? Icons.play_circle : Icons.radio_button_unchecked,
-                      color: isDone ? AppColors.success : isCurrent ? AppColors.primary : AppColors.textMuted,
+                      color: isDone ? AppColors.success : isCurrent ? AppColors.primary : context.textMuted,
                       size: 20,
                     ),
                     const SizedBox(width: 8),
-                    Icon(step.$2, color: isDone || isCurrent ? Colors.white : AppColors.textMuted, size: 16),
+                    Icon(step.$2, color: isDone || isCurrent ? context.textPrimary : context.textMuted, size: 16),
                     const SizedBox(width: 8),
                     Text(
                       step.$1,
                       style: TextStyle(
-                        color: isDone || isCurrent ? Colors.white : AppColors.textMuted,
+                        color: isDone || isCurrent ? context.textPrimary : context.textMuted,
                         fontSize: 13,
                         fontWeight: isCurrent ? FontWeight.w600 : FontWeight.normal,
                       ),
@@ -162,11 +162,11 @@ class GlassCardContent extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            AppColors.surfaceCard.withOpacity(0.95),
-            AppColors.surfaceDark.withOpacity(0.95),
+            context.surfaceCard.withOpacity(0.95),
+            context.surfaceDark.withOpacity(0.95),
           ],
         ),
-        border: Border.all(color: Colors.white.withOpacity(0.08)),
+        border: Border.all(color: context.backgroundColor(0.08)),
       ),
       child: child,
     );

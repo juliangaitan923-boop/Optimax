@@ -1,6 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import '../core/constants.dart';
+import '../core/theme_colors.dart';
 
 class HistoryLineChart extends StatelessWidget {
   final List<FlSpot> spots;
@@ -21,7 +22,7 @@ class HistoryLineChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (spots.length < 2) {
-      return const Center(child: Text('Esperando datos...', style: TextStyle(color: AppColors.textMuted, fontSize: 11)));
+      return Center(child: Text('Esperando datos...', style: TextStyle(color: context.textMuted, fontSize: 11)));
     }
 
     return LineChart(
@@ -33,7 +34,7 @@ class HistoryLineChart extends StatelessWidget {
           drawVerticalLine: false,
           horizontalInterval: (maxY - minY) / 4,
           getDrawingHorizontalLine: (value) => FlLine(
-            color: Colors.white.withOpacity(0.05),
+            color: context.backgroundColor(0.05),
             strokeWidth: 1,
           ),
         ),
@@ -73,7 +74,7 @@ class HistoryLineChart extends StatelessWidget {
             getTooltipItems: (touchedSpots) => touchedSpots.map((spot) {
               return LineTooltipItem(
                 '${spot.y.toStringAsFixed(0)}%',
-                const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600),
+                TextStyle(color: context.textPrimary, fontSize: 12, fontWeight: FontWeight.w600),
               );
             }).toList(),
           ),
