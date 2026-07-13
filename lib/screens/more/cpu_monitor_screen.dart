@@ -25,7 +25,6 @@ class CpuMonitorScreen extends ConsumerWidget {
     final ramSpots = history.ramHistory.map((p) {
       return FlSpot(p.time.millisecondsSinceEpoch.toDouble(), p.value);
     }).toList();
-    final now = DateTime.now().millisecondsSinceEpoch.toDouble();
 
     return Scaffold(
       appBar: AppBar(
@@ -65,7 +64,7 @@ class CpuMonitorScreen extends ConsumerWidget {
                   SizedBox(
                     height: 140,
                     child: HistoryLineChart(
-                      spots: cpuSpots.map((s) => FlSpot((s.x - now) / 1000, s.y)).toList(),
+                      spots: cpuSpots.map((s) => FlSpot(s.x / 1000, s.y)).toList(),
                       color: AppColors.primary,
                       label: 'CPU %',
                       minY: 0,
@@ -102,7 +101,7 @@ class CpuMonitorScreen extends ConsumerWidget {
                   SizedBox(
                     height: 140,
                     child: HistoryLineChart(
-                      spots: ramSpots.map((s) => FlSpot((s.x - now) / 1000, s.y)).toList(),
+                      spots: ramSpots.map((s) => FlSpot(s.x / 1000, s.y)).toList(),
                       color: AppColors.secondary,
                       label: 'RAM %',
                       minY: 0,

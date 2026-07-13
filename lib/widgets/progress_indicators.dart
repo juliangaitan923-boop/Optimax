@@ -1,5 +1,104 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../core/constants.dart';
+
+class ShimmerLoading extends StatefulWidget {
+  final double width;
+  final double height;
+  final double borderRadius;
+
+  const ShimmerLoading({
+    super.key,
+    this.width = double.infinity,
+    this.height = 16,
+    this.borderRadius = 8,
+  });
+
+  @override
+  State<ShimmerLoading> createState() => _ShimmerLoadingState();
+}
+
+class _ShimmerLoadingState extends State<ShimmerLoading>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 1500),
+      vsync: this,
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        return Container(
+          width: widget.width,
+          height: widget.height,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(widget.borderRadius),
+            gradient: LinearGradient(
+              colors: [
+                AppColors.surfaceCard.withOpacity(0.3),
+                AppColors.surfaceCardLight.withOpacity(0.5),
+                AppColors.surfaceCard.withOpacity(0.3),
+              ],
+              stops: const [0.0, 0.5, 1.0],
+              begin: Alignment(-1.0 + _controller.value * 2, 0),
+              end: Alignment(1.0 + _controller.value * 2, 0),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class SkeletonCard extends StatelessWidget {
+  final int lineCount;
+
+  const SkeletonCard({super.key, this.lineCount = 3});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(24),
+        color: AppColors.surfaceCard,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const ShimmerLoading(width: 120, height: 18, borderRadius: 4),
+          const SizedBox(height: 16),
+          ...List.generate(
+            lineCount,
+            (i) => Padding(
+              padding: EdgeInsets.only(bottom: i < lineCount - 1 ? 10 : 0),
+              child: ShimmerLoading(
+                width: 120 + math.Random().nextInt(180).toDouble(),
+                height: 14,
+                borderRadius: 4,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
 
 class AnimatedCircularScore extends StatefulWidget {
   final int score;

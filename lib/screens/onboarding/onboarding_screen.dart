@@ -169,7 +169,7 @@ class _OnboardingPage {
 class _PageContent extends StatelessWidget {
   final _OnboardingPage page;
 
-  const _PageContent({required this.page});
+  const _PageContent({super.key, required this.page});
 
   @override
   Widget build(BuildContext context) {

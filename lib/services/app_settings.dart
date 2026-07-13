@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
+import 'logger_service.dart';
 
 class AppSettings {
   static AppSettings? _instance;
@@ -23,7 +24,8 @@ class AppSettings {
         final content = await file.readAsString();
         _data = json.decode(content) as Map<String, dynamic>;
       }
-    } catch (_) {
+    } catch (e) {
+      log.w('AppSettings.init failed', e);
       _data = {};
     }
   }
@@ -32,7 +34,9 @@ class AppSettings {
     try {
       final file = File(_filePath);
       await file.writeAsString(json.encode(_data));
-    } catch (_) {}
+    } catch (e) {
+      log.w('AppSettings._save failed', e);
+    }
   }
 
   bool getBool(String key, {bool defaultValue = false}) {

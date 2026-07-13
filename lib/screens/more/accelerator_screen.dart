@@ -5,6 +5,7 @@ import '../../core/constants.dart';
 import '../../models/process_info.dart';
 import '../../providers/system_providers.dart';
 import '../../services/mock_service.dart';
+import '../../widgets/boost_overlay.dart';
 import '../../widgets/glass_card.dart';
 import '../../widgets/gradient_button.dart';
 
@@ -80,7 +81,6 @@ class _AcceleratorScreenState extends ConsumerState<AcceleratorScreen> {
 
     final ramFreedBytes = result['ramFreed'] as int? ?? 0;
     final processesKilled = result['processesKilled'] as int? ?? 0;
-    final killedList = result['killedProcesses'] as List<dynamic>? ?? [];
 
     setState(() {
       _killedSoFar = processesKilled;
@@ -95,11 +95,11 @@ class _AcceleratorScreenState extends ConsumerState<AcceleratorScreen> {
     if (!mounted) return;
     showDialog(
       context: context,
-      builder: (ctx) => _BoostResultDialog(
-        ramFreed: ramFreedBytes,
-        processesKilled: processesKilled,
-        killedList: killedList.cast<String>(),
-      ),
+          builder: (ctx) => BoostOverlay(result: {
+            'ramFreed': ramFreedBytes,
+            'cacheFreed': 0,
+            'processesKilled': processesKilled,
+          }),
     );
   }
 
@@ -333,93 +333,4 @@ class _AcceleratorScreenState extends ConsumerState<AcceleratorScreen> {
   }
 }
 
-class _BoostResultDialog extends StatelessWidget {
-  final int ramFreed;
-  final int processesKilled;
-  final List<String> killedList;
 
-  const _BoostResultDialog({
-    required this.ramFreed,
-    required this.processesKilled,
-    required this.killedList,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Dialog(
-      backgroundColor: Colors.transparent,
-      child: GlassCard(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 64, height: 64,
-              decoration: const BoxDecoration(color: AppColors.success, shape: BoxShape.circle),
-              child: const Icon(Icons.bolt, color: Colors.white, size: 36),
-            ),
-            const SizedBox(height: 16),
-            const Text('Aceleración completada',
-              style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 20),
-            _resultRow(Icons.memory, 'RAM liberada', _formatBytes(ramFreed)),
-            const SizedBox(height: 12),
-            _resultRow(Icons.close, 'Procesos cerrados', '$processesKilled'),
-            if (killedList.isNotEmpty) ...[
-              const SizedBox(height: 12),
-              const Divider(color: Colors.white10, height: 16),
-              SizedBox(
-                height: (killedList.length * 24).clamp(0, 120).toDouble(),
-                child: ListView(
-                  children: killedList.map((name) => Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 2),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.check, color: AppColors.success, size: 14),
-                        const SizedBox(width: 8),
-                        Text(name, style: const TextStyle(color: AppColors.textSecondary, fontSize: 12)),
-                      ],
-                    ),
-                  )).toList(),
-                ),
-              ),
-            ],
-            const SizedBox(height: 24),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: Colors.white,
-                minimumSize: const Size(double.infinity, 44),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-              ),
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Aceptar', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _resultRow(IconData icon, String label, String value) {
-    return Row(
-      children: [
-        Container(
-          width: 40, height: 40,
-          decoration: BoxDecoration(color: AppColors.primary.withOpacity(0.15), borderRadius: BorderRadius.circular(12)),
-          child: Icon(icon, color: AppColors.primary, size: 20),
-        ),
-        const SizedBox(width: 14),
-        Expanded(child: Text(label, style: const TextStyle(color: AppColors.textSecondary, fontSize: 14))),
-        Text(value, style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
-      ],
-    );
-  }
-
-  String _formatBytes(int bytes) {
-    if (bytes < 1024) return '$bytes B';
-    if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(0)} KB';
-    if (bytes < 1024 * 1024 * 1024) return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
-    return '${(bytes / (1024 * 1024 * 1024)).toStringAsFixed(1)} GB';
-  }
-}

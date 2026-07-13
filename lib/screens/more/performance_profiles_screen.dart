@@ -73,6 +73,7 @@ class _ProfileCard extends StatelessWidget {
   final VoidCallback onTap;
 
   const _ProfileCard({
+    super.key,
     required this.data,
     required this.isSelected,
     required this.onTap,

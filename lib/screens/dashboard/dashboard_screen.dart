@@ -1,5 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/constants.dart';
 import '../../providers/system_providers.dart';
@@ -37,11 +38,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     final ramSpots = history.ramHistory.map((p) => FlSpot(p.time.millisecondsSinceEpoch.toDouble(), p.value)).toList();
     final batterySpots = history.batteryHistory.map((p) => FlSpot(p.time.millisecondsSinceEpoch.toDouble(), p.value)).toList();
 
-    // Normalize timestamps to relative seconds for better display
-    final now = DateTime.now().millisecondsSinceEpoch.toDouble();
-    final cpuSpotsNorm = cpuSpots.map((s) => FlSpot((s.x - now) / 1000, s.y)).toList();
-    final ramSpotsNorm = ramSpots.map((s) => FlSpot((s.x - now) / 1000, s.y)).toList();
-    final batterySpotsNorm = batterySpots.map((s) => FlSpot((s.x - now) / 1000, s.y)).toList();
+    final cpuSpotsNorm = cpuSpots.map((s) => FlSpot(s.x / 1000, s.y)).toList();
+    final ramSpotsNorm = ramSpots.map((s) => FlSpot(s.x / 1000, s.y)).toList();
+    final batterySpotsNorm = batterySpots.map((s) => FlSpot(s.x / 1000, s.y)).toList();
 
     return Scaffold(
       appBar: AppBar(
@@ -71,7 +70,13 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             ),
             child: IconButton(
               icon: const Icon(Icons.refresh_rounded),
-              onPressed: () => ref.invalidate(cpuInfoProvider),
+              onPressed: () {
+                ref.invalidate(cpuInfoProvider);
+                ref.invalidate(ramInfoProvider);
+                ref.invalidate(storageInfoProvider);
+                ref.invalidate(batteryInfoProvider);
+                ref.invalidate(healthScoreProvider);
+              },
               color: AppColors.textMuted,
               iconSize: 20,
             ),
@@ -205,6 +210,20 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 isLoading: isBoosting,
                 onPressed: isBoosting ? null : () => _startBoost(context, ref),
               ),
+              const SizedBox(height: 16),
+              Center(
+                child: TextButton.icon(
+                  icon: const Icon(Icons.delete_outline, size: 16),
+                  label: const Text('Limpiar historial de gráficos', style: TextStyle(fontSize: 12)),
+                  style: TextButton.styleFrom(foregroundColor: AppColors.textMuted),
+                  onPressed: () {
+                    ref.read(historyServiceProvider).clear();
+                    ref.invalidate(cpuInfoProvider);
+                    ref.invalidate(ramInfoProvider);
+                    ref.invalidate(batteryInfoProvider);
+                  },
+                ),
+              ),
               const SizedBox(height: 24),
             ],
           ),
@@ -214,10 +233,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   }
 
   void _goToBattery(BuildContext context, WidgetRef ref) {
-    ref.read(tabIndexProvider.notifier).state = 2;
+    ref.read(tabIndexProvider.notifier).state = batteryTabIndex;
   }
 
   void _startBoost(BuildContext context, WidgetRef ref) {
+    HapticFeedback.heavyImpact();
     ref.read(isBoostingProvider.notifier).state = true;
     showDialog(
       context: context,
@@ -226,19 +246,17 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     );
 
     ref.read(boostResultProvider.future).then((result) {
+      if (!context.mounted) return;
       ref.read(isBoostingProvider.notifier).state = false;
       Navigator.of(context).pop();
-      if (context.mounted) {
-        showDialog(
-          context: context,
-          builder: (ctx) => BoostOverlay(result: result),
-        );
-      }
+      showDialog(
+        context: context,
+        builder: (ctx) => BoostOverlay(result: result),
+      );
     }).catchError((_) {
+      if (!context.mounted) return;
       ref.read(isBoostingProvider.notifier).state = false;
-      if (context.mounted) {
-        Navigator.of(context).pop();
-      }
+      Navigator.of(context).pop();
     });
   }
 }

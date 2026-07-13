@@ -1,17 +1,19 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/constants.dart';
+import '../../providers/system_providers.dart';
 import '../../services/storage_analyzer_service.dart';
 import '../../widgets/glass_card.dart';
 
-class StorageAnalyzerScreen extends StatefulWidget {
+class StorageAnalyzerScreen extends ConsumerStatefulWidget {
   const StorageAnalyzerScreen({super.key});
 
   @override
-  State<StorageAnalyzerScreen> createState() => _StorageAnalyzerScreenState();
+  ConsumerState<StorageAnalyzerScreen> createState() => _StorageAnalyzerScreenState();
 }
 
-class _StorageAnalyzerScreenState extends State<StorageAnalyzerScreen> {
+class _StorageAnalyzerScreenState extends ConsumerState<StorageAnalyzerScreen> {
   List<StorageCategory>? _categories;
   bool _isLoading = true;
 
@@ -23,7 +25,7 @@ class _StorageAnalyzerScreenState extends State<StorageAnalyzerScreen> {
 
   Future<void> _load() async {
     setState(() => _isLoading = true);
-    final service = StorageAnalyzerService();
+    final service = ref.read(storageAnalyzerProvider);
     final data = await service.analyze();
     setState(() {
       _categories = data;

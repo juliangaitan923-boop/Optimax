@@ -9,6 +9,7 @@ import '../services/device_service.dart';
 import '../services/mock_service.dart';
 import '../services/history_service.dart';
 import '../services/app_settings.dart';
+import '../services/storage_analyzer_service.dart';
 
 final deviceServiceProvider = Provider<DeviceService>((ref) => DeviceService());
 
@@ -177,3 +178,5 @@ final boostResultProvider = FutureProvider.autoDispose<Map<String, dynamic>>((re
     return await MockService.cleanCache();
   }
 });
+
+final storageAnalyzerProvider = Provider<StorageAnalyzerService>((ref) => StorageAnalyzerService());

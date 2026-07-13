@@ -1,3 +1,5 @@
+import '../core/utils.dart';
+
 class RamInfo {
   final int total;
   final int used;
@@ -20,16 +22,7 @@ class RamInfo {
     );
   }
 
-  String get totalFormatted => _formatBytes(total);
-  String get usedFormatted => _formatBytes(used);
-  String get availableFormatted => _formatBytes(available);
-
-  static String _formatBytes(int bytes) {
-    if (bytes < 1024) return '$bytes B';
-    if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(0)} KB';
-    if (bytes < 1024 * 1024 * 1024) {
-      return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
-    }
-    return '${(bytes / (1024 * 1024 * 1024)).toStringAsFixed(1)} GB';
-  }
+  String get totalFormatted => formatBytes(total);
+  String get usedFormatted => formatBytes(used);
+  String get availableFormatted => formatBytes(available);
 }

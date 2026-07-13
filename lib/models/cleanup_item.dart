@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../core/utils.dart';
 
 class CleanupItem {
   final String id;
@@ -17,12 +18,5 @@ class CleanupItem {
     this.isRecommended = true,
   });
 
-  String get sizeFormatted {
-    if (size < 1024) return '$size B';
-    if (size < 1024 * 1024) return '${(size / 1024).toStringAsFixed(0)} KB';
-    if (size < 1024 * 1024 * 1024) {
-      return '${(size / (1024 * 1024)).toStringAsFixed(1)} MB';
-    }
-    return '${(size / (1024 * 1024 * 1024)).toStringAsFixed(1)} GB';
-  }
+  String get sizeFormatted => formatBytes(size);
 }

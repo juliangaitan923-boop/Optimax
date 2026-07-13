@@ -8,19 +8,20 @@ import 'screens/cleaner/cleaner_screen.dart';
 import 'screens/battery/battery_screen.dart';
 import 'screens/more/more_screen.dart';
 import 'screens/onboarding/onboarding_screen.dart';
+import 'screens/splash_screen.dart';
 import 'providers/system_providers.dart';
 import 'providers/theme_provider.dart';
 import 'services/update_service.dart';
 import 'services/app_info.dart';
 import 'services/logger_service.dart';
-import 'widgets/glass_card.dart';
+import 'widgets/update_dialogs.dart';
 
 class OptiMaxApp extends ConsumerWidget {
   const OptiMaxApp({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final themeMode = ref.watch(themeProvider.notifier).themeMode;
+    final themeMode = ref.watch(themeProvider).mapToThemeMode();
     return MaterialApp(
       title: 'OptiMax',
       debugShowCheckedModeBanner: false,
@@ -39,8 +40,10 @@ class _AppEntry extends ConsumerStatefulWidget {
   ConsumerState<_AppEntry> createState() => _AppEntryState();
 }
 
+enum _AppEntryStateEnum { loading, onboarding, main }
+
 class _AppEntryState extends ConsumerState<_AppEntry> {
-  bool? _showOnboarding;
+  _AppEntryStateEnum _state = _AppEntryStateEnum.loading;
 
   @override
   void initState() {
@@ -53,26 +56,25 @@ class _AppEntryState extends ConsumerState<_AppEntry> {
       final prefs = await SharedPreferences.getInstance();
       final completed = prefs.getBool('onboarding_completed') ?? false;
       if (mounted) {
-        setState(() => _showOnboarding = !completed);
+        setState(() => _state = completed ? _AppEntryStateEnum.main : _AppEntryStateEnum.onboarding);
       }
     } catch (e) {
       if (mounted) {
-        setState(() => _showOnboarding = false);
+        setState(() => _state = _AppEntryStateEnum.main);
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_showOnboarding == null) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+    switch (_state) {
+      case _AppEntryStateEnum.loading:
+        return const SplashScreen(child: SizedBox());
+      case _AppEntryStateEnum.onboarding:
+        return const OnboardingScreen();
+      case _AppEntryStateEnum.main:
+        return const MainShell();
     }
-    if (_showOnboarding!) {
-      return const OnboardingScreen();
-    }
-    return const MainShell();
   }
 }
 
@@ -126,50 +128,10 @@ class _MainShellState extends ConsumerState<MainShell> {
   void _showUpdateDialog(UpdateInfo info) {
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: AppColors.surfaceCard,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        title: const Row(
-          children: [
-            Icon(Icons.system_update, color: AppColors.primary, size: 28),
-            SizedBox(width: 12),
-            Text('Actualización disponible', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Versión: ${info.version}', style: const TextStyle(color: AppColors.primary, fontSize: 16, fontWeight: FontWeight.w600)),
-            const SizedBox(height: 8),
-            Text(info.changelog, style: const TextStyle(color: AppColors.textSecondary, fontSize: 13)),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(ctx);
-              UpdateService.skipVersion(info.version);
-            },
-            child: const Text('Saltar versión', style: TextStyle(color: AppColors.textMuted)),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Más tarde', style: TextStyle(color: AppColors.textMuted)),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            ),
-            onPressed: () {
-              Navigator.pop(ctx);
-              _downloadAndInstall(info);
-            },
-            child: const Text('Actualizar ahora'),
-          ),
-        ],
+      builder: (ctx) => UpdateAvailableDialog(
+        info: info,
+        onDownload: () => _downloadAndInstall(info),
+        onSkip: () => UpdateService.skipVersion(info.version),
       ),
     );
   }
@@ -178,7 +140,7 @@ class _MainShellState extends ConsumerState<MainShell> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (_) => const _UpdateProgressDialog(),
+      builder: (_) => const UpdateProgressDialog(),
     );
     final success = await UpdateService.downloadAndInstall(info);
     if (!mounted) return;
@@ -194,14 +156,15 @@ class _MainShellState extends ConsumerState<MainShell> {
   @override
   Widget build(BuildContext context) {
     final currentIndex = ref.watch(tabIndexProvider);
+    final safeIndex = currentIndex.clamp(0, _screens.length - 1);
     return Scaffold(
       body: AnimatedSwitcher(
         duration: const Duration(milliseconds: 300),
         switchInCurve: Curves.easeOutCubic,
         switchOutCurve: Curves.easeInCubic,
         child: KeyedSubtree(
-          key: ValueKey(currentIndex),
-          child: _screens[currentIndex],
+          key: ValueKey(safeIndex),
+          child: _screens[safeIndex],
         ),
       ),
       bottomNavigationBar: Container(
@@ -226,8 +189,8 @@ class _MainShellState extends ConsumerState<MainShell> {
         child: ClipRRect(
           borderRadius: BorderRadius.circular(28),
           child: BottomNavigationBar(
-            currentIndex: currentIndex,
-            onTap: (index) => ref.read(tabIndexProvider.notifier).state = index,
+            currentIndex: safeIndex,
+            onTap: (index) => ref.read(tabIndexProvider.notifier).state = index.clamp(0, 3),
             elevation: 0,
             backgroundColor: Colors.transparent,
             selectedItemColor: AppTheme.primary,
@@ -261,7 +224,7 @@ const _navLabels = ['Dashboard', 'Limpiar', 'Batería', 'Más'];
 class _NavIcon extends StatelessWidget {
   final int index;
   final bool isSelected;
-  const _NavIcon(this.index, {required this.isSelected});
+  const _NavIcon(this.index, {super.key, required this.isSelected});
 
   @override
   Widget build(BuildContext context) {
@@ -293,34 +256,4 @@ class _NavIcon extends StatelessWidget {
   }
 }
 
-class _UpdateProgressDialog extends StatelessWidget {
-  const _UpdateProgressDialog();
 
-  @override
-  Widget build(BuildContext context) {
-    return const Dialog(
-      backgroundColor: Colors.transparent,
-      child: const GlassCard(
-        padding: const EdgeInsets.all(32),
-        child: const Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            SizedBox(
-              height: 50,
-              width: 50,
-              child: CircularProgressIndicator(
-                strokeWidth: 3,
-                valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
-              ),
-            ),
-            SizedBox(height: 20),
-            Text(
-              'Descargando actualización...',
-              style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}

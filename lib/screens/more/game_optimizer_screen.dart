@@ -47,7 +47,7 @@ class _GameOptimizerScreenState extends ConsumerState<GameOptimizerScreen> {
       _allApps = apps;
       _filteredApps = apps;
     }
-    setState(() => _loading = false);
+    if (mounted) setState(() => _loading = false);
   }
 
   void _filterApps(String query) {
@@ -68,7 +68,12 @@ class _GameOptimizerScreenState extends ConsumerState<GameOptimizerScreen> {
     final service = ref.read(deviceServiceProvider);
     final packageName = game['packageName'] as String? ?? '';
 
-    await service.killPackage(packageName);
+    final processes = await service.getProcessList();
+    for (final proc in processes) {
+      if (!proc.isSystem && proc.packageName != packageName) {
+        await service.killProcess(proc.pid);
+      }
+    }
     await service.enableGameMode();
     await service.setPerformanceProfile('gaming');
 

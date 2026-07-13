@@ -42,6 +42,8 @@ class AppStrings {
   static const healthScore = 'Salud del sistema';
 }
 
+const batteryTabIndex = 2;
+
 class AppDurations {
   static const scanDuration = Duration(seconds: 2);
   static const boostDuration = Duration(seconds: 3);

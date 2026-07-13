@@ -25,8 +25,7 @@ class _BatteryScreenState extends ConsumerState<BatteryScreen> {
     final batterySpots = history.batteryHistory.map((p) {
       return FlSpot(p.time.millisecondsSinceEpoch.toDouble(), p.value);
     }).toList();
-    final now = DateTime.now().millisecondsSinceEpoch.toDouble();
-    final batterySpotsNorm = batterySpots.map((s) => FlSpot((s.x - now) / 1000, s.y)).toList();
+    final batterySpotsNorm = batterySpots.map((s) => FlSpot(s.x / 1000, s.y)).toList();
 
     final period = _tabIndex == 0 ? 'daily' : 'weekly';
     final batteryUsageAsync = ref.watch(batteryUsageProvider(period));
@@ -64,7 +63,7 @@ class _BatteryScreenState extends ConsumerState<BatteryScreen> {
                             strokeWidth: 10,
                             backgroundColor: Colors.white.withOpacity(0.05),
                             valueColor: AlwaysStoppedAnimation<Color>(
-                              battery?.percent != null && battery!.percent > 20
+                              battery != null && battery.percent > 20
                                   ? AppColors.success : AppColors.warning,
                             ),
                           ),
@@ -109,7 +108,7 @@ class _BatteryScreenState extends ConsumerState<BatteryScreen> {
                     height: 120,
                     child: HistoryLineChart(
                       spots: batterySpotsNorm,
-                      color: battery?.percent != null && battery!.percent > 20
+                      color: battery != null && battery.percent > 20
                           ? AppColors.success : AppColors.warning,
                       minY: 0, maxY: 100,
                     ),

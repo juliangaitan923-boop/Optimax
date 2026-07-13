@@ -57,8 +57,8 @@ class UpdateService {
   }
 
   static int compareVersions(String a, String b) {
-    final partsA = a.split('.').map(int.parse).toList();
-    final partsB = b.split('.').map(int.parse).toList();
+    final partsA = a.split('.').map((p) => int.tryParse(p) ?? 0).toList();
+    final partsB = b.split('.').map((p) => int.tryParse(p) ?? 0).toList();
     final len = partsA.length > partsB.length ? partsB.length : partsA.length;
     for (int i = 0; i < len; i++) {
       if (partsA[i] > partsB[i]) return 1;

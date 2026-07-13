@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import '../core/constants.dart';
+import '../core/utils.dart';
 
 class BoostOverlay extends StatelessWidget {
   final Map<String, dynamic> result;
@@ -26,9 +27,9 @@ class BoostOverlay extends StatelessWidget {
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
             ),
             const SizedBox(height: 24),
-            _buildResultRow(Icons.memory, 'RAM liberada', _formatBytes(ramFreed)),
+            _buildResultRow(Icons.memory, 'RAM liberada', formatBytes(ramFreed)),
             const SizedBox(height: 12),
-            _buildResultRow(Icons.cleaning_services, 'Caché limpiada', _formatBytes(cacheFreed)),
+            _buildResultRow(Icons.cleaning_services, 'Caché limpiada', formatBytes(cacheFreed)),
             const SizedBox(height: 12),
             _buildResultRow(Icons.close, 'Procesos cerrados', '$processesKilled'),
             const SizedBox(height: 24),
@@ -49,14 +50,8 @@ class BoostOverlay extends StatelessWidget {
       ],
     );
   }
-
-  String _formatBytes(int bytes) {
-    if (bytes < 1024) return '$bytes B';
-    if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(0)} KB';
-    if (bytes < 1024 * 1024 * 1024) return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
-    return '${(bytes / (1024 * 1024 * 1024)).toStringAsFixed(1)} GB';
   }
-}
+
 
 class StepBoostOverlay extends StatefulWidget {
   const StepBoostOverlay({super.key});

@@ -5,6 +5,16 @@ import '../services/logger_service.dart';
 
 enum AppThemeMode { dark, light, system }
 
+extension AppThemeModeX on AppThemeMode {
+  ThemeMode mapToThemeMode() {
+    return switch (this) {
+      AppThemeMode.dark => ThemeMode.dark,
+      AppThemeMode.light => ThemeMode.light,
+      AppThemeMode.system => ThemeMode.system,
+    };
+  }
+}
+
 class ThemeNotifier extends StateNotifier<AppThemeMode> {
   ThemeNotifier() : super(AppThemeMode.dark);
 
@@ -31,11 +41,6 @@ class ThemeNotifier extends StateNotifier<AppThemeMode> {
     }
   }
 
-  ThemeMode get themeMode => switch (state) {
-        AppThemeMode.dark => ThemeMode.dark,
-        AppThemeMode.light => ThemeMode.light,
-        AppThemeMode.system => ThemeMode.system,
-      };
 }
 
 final themeProvider = StateNotifierProvider<ThemeNotifier, AppThemeMode>(

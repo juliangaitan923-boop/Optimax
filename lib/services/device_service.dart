@@ -4,6 +4,7 @@ import '../models/ram_info.dart';
 import '../models/storage_info.dart';
 import '../models/battery_info.dart';
 import '../models/process_info.dart';
+import 'logger_service.dart';
 import 'mock_service.dart';
 
 class DeviceService {
@@ -15,7 +16,9 @@ class DeviceService {
       if (result != null) {
         return CpuInfo.fromMap(Map<String, dynamic>.from(result));
       }
-    } catch (_) {}
+    } catch (e) {
+      log.w('getCpuInfo failed', e);
+    }
     return CpuInfo();
   }
 
@@ -25,7 +28,9 @@ class DeviceService {
       if (result != null) {
         return RamInfo.fromMap(Map<String, dynamic>.from(result));
       }
-    } catch (_) {}
+    } catch (e) {
+      log.w('getRamInfo failed', e);
+    }
     return RamInfo();
   }
 
@@ -35,7 +40,9 @@ class DeviceService {
       if (result != null) {
         return StorageInfo.fromMap(Map<String, dynamic>.from(result));
       }
-    } catch (_) {}
+    } catch (e) {
+      log.w('getStorageInfo failed', e);
+    }
     return StorageInfo();
   }
 
@@ -45,7 +52,9 @@ class DeviceService {
       if (result != null) {
         return BatteryInfo.fromMap(Map<String, dynamic>.from(result));
       }
-    } catch (_) {}
+    } catch (e) {
+      log.w('getBatteryInfo failed', e);
+    }
     return BatteryInfo();
   }
 
@@ -55,7 +64,9 @@ class DeviceService {
       if (result != null) {
         return result.map((e) => ProcessInfo.fromMap(Map<String, dynamic>.from(e))).toList();
       }
-    } catch (_) {}
+    } catch (e) {
+      log.w('getProcessList failed', e);
+    }
     return [];
   }
 
@@ -65,7 +76,9 @@ class DeviceService {
       if (result != null) {
         return result.map((e) => Map<String, dynamic>.from(e)).toList();
       }
-    } catch (_) {}
+    } catch (e) {
+      log.w('getTopCpuApps failed', e);
+    }
     return [];
   }
 
@@ -75,7 +88,9 @@ class DeviceService {
       if (result != null) {
         return Map<String, dynamic>.from(result);
       }
-    } catch (_) {}
+    } catch (e) {
+      log.w('cleanCache failed', e);
+    }
     return {'success': false};
   }
 
@@ -83,7 +98,8 @@ class DeviceService {
     try {
       final result = await _channel.invokeMethod<bool>('killProcess', {'pid': pid});
       return result ?? false;
-    } catch (_) {
+    } catch (e) {
+      log.w('killProcess failed', e);
       return false;
     }
   }
@@ -92,7 +108,8 @@ class DeviceService {
     try {
       final result = await _channel.invokeMethod<bool>('enableGameMode');
       return result ?? false;
-    } catch (_) {
+    } catch (e) {
+      log.w('enableGameMode failed', e);
       return false;
     }
   }
@@ -101,7 +118,8 @@ class DeviceService {
     try {
       final result = await _channel.invokeMethod<bool>('disableGameMode');
       return result ?? false;
-    } catch (_) {
+    } catch (e) {
+      log.w('disableGameMode failed', e);
       return false;
     }
   }
@@ -110,7 +128,8 @@ class DeviceService {
     try {
       final result = await _channel.invokeMethod<bool>('isGameModeActive');
       return result ?? false;
-    } catch (_) {
+    } catch (e) {
+      log.w('isGameModeActive failed', e);
       return false;
     }
   }
@@ -119,7 +138,8 @@ class DeviceService {
     try {
       final result = await _channel.invokeMethod<bool>('setPerformanceProfile', {'profile': profile});
       return result ?? false;
-    } catch (_) {
+    } catch (e) {
+      log.w('setPerformanceProfile failed', e);
       return false;
     }
   }
@@ -128,7 +148,8 @@ class DeviceService {
     try {
       final result = await _channel.invokeMethod<String>('getCurrentProfile');
       return result ?? 'normal';
-    } catch (_) {
+    } catch (e) {
+      log.w('getCurrentProfile failed', e);
       return 'normal';
     }
   }
@@ -137,7 +158,8 @@ class DeviceService {
     try {
       final result = await _channel.invokeMethod<bool>('openDisplaySettings');
       return result ?? false;
-    } catch (_) {
+    } catch (e) {
+      log.w('openDisplaySettings failed', e);
       return false;
     }
   }
@@ -146,7 +168,8 @@ class DeviceService {
     try {
       final result = await _channel.invokeMethod<bool>('openWifiSettings');
       return result ?? false;
-    } catch (_) {
+    } catch (e) {
+      log.w('openWifiSettings failed', e);
       return false;
     }
   }
@@ -155,7 +178,8 @@ class DeviceService {
     try {
       final result = await _channel.invokeMethod<bool>('openBatterySaverSettings');
       return result ?? false;
-    } catch (_) {
+    } catch (e) {
+      log.w('openBatterySaverSettings failed', e);
       return false;
     }
   }
@@ -166,7 +190,9 @@ class DeviceService {
       if (result != null) {
         return result.map((e) => Map<String, dynamic>.from(e)).toList();
       }
-    } catch (_) {}
+    } catch (e) {
+      log.w('getInstalledApps failed', e);
+    }
     return await MockService.getInstalledApps();
   }
 
@@ -174,7 +200,8 @@ class DeviceService {
     try {
       final result = await _channel.invokeMethod<bool>('killPackage', {'package': packageName});
       return result ?? false;
-    } catch (_) {
+    } catch (e) {
+      log.w('killPackage failed', e);
       return false;
     }
   }
@@ -207,7 +234,9 @@ class DeviceService {
       final ramAfter = await getRamInfo();
       ramFreed = ramAfter.available - ramBefore.available;
 
-    } catch (_) {}
+    } catch (e) {
+      log.w('boost failed', e);
+    }
 
     return {
       'ramFreed': ramFreed < 0 ? 0 : ramFreed,
@@ -223,7 +252,9 @@ class DeviceService {
       if (result != null) {
         return Map<String, dynamic>.from(result);
       }
-    } catch (_) {}
+    } catch (e) {
+      log.w('getDeviceInfo failed', e);
+    }
     return {'error': 'No disponible'};
   }
 
@@ -233,7 +264,9 @@ class DeviceService {
       if (result != null) {
         return Map<String, dynamic>.from(result);
       }
-    } catch (_) {}
+    } catch (e) {
+      log.w('executeShellCommand failed', e);
+    }
     return {'success': false, 'error': 'No disponible'};
   }
 
@@ -243,7 +276,9 @@ class DeviceService {
       if (result != null) {
         return Map<String, dynamic>.from(result);
       }
-    } catch (_) {}
+    } catch (e) {
+      log.w('applyExtremeOptimizations failed', e);
+    }
     return {'success': false, 'error': 'No disponible'};
   }
 
@@ -253,7 +288,9 @@ class DeviceService {
       if (result != null) {
         return Map<String, dynamic>.from(result);
       }
-    } catch (_) {}
+    } catch (e) {
+      log.w('revertExtremeOptimizations failed', e);
+    }
     return {'success': false, 'error': 'No disponible'};
   }
 
@@ -263,7 +300,9 @@ class DeviceService {
       if (result != null) {
         return Map<String, dynamic>.from(result);
       }
-    } catch (_) {}
+    } catch (e) {
+      log.w('deepBoost failed', e);
+    }
     return {'success': false, 'error': 'No disponible'};
   }
 
@@ -273,7 +312,9 @@ class DeviceService {
       if (result != null) {
         return result.map((e) => Map<String, dynamic>.from(e)).toList();
       }
-    } catch (_) {}
+    } catch (e) {
+      log.w('getBatteryUsageStats failed', e);
+    }
     return await MockService.getBatteryUsageStats(period);
   }
 }

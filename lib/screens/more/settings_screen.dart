@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/constants.dart';
 import '../../providers/system_providers.dart';
+import '../../providers/theme_provider.dart';
 import '../../services/app_settings.dart';
 import '../../services/update_service.dart';
 import '../../services/app_info.dart';
 import '../../widgets/glass_card.dart';
+import '../../widgets/update_dialogs.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -30,6 +32,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Ajustes', style: TextStyle(fontWeight: FontWeight.bold)),
@@ -42,6 +45,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 8),
+            _sectionHeader('Apariencia'),
+            const SizedBox(height: 8),
+            GlassCard(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+              child: _themeSelector(isDark),
+            ),
+            const SizedBox(height: 24),
             _sectionHeader('General'),
             const SizedBox(height: 8),
             GlassCard(
@@ -110,6 +120,57 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     );
   }
 
+  Widget _themeSelector(bool isDark) {
+    final currentTheme = ref.watch(themeProvider);
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: AppColors.primary.withOpacity(0.12),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(
+              currentTheme == AppThemeMode.light
+                  ? Icons.light_mode
+                  : currentTheme == AppThemeMode.dark
+                      ? Icons.dark_mode
+                      : Icons.brightness_auto,
+              color: AppColors.primary,
+              size: 20,
+            ),
+          ),
+          const SizedBox(width: 14),
+          const Expanded(
+            child: Text(
+              'Tema',
+              style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w500),
+            ),
+          ),
+          DropdownButton<AppThemeMode>(
+            value: currentTheme,
+            dropdownColor: AppColors.surfaceCard,
+            style: const TextStyle(color: Colors.white, fontSize: 14),
+            underline: const SizedBox(),
+            items: const [
+              DropdownMenuItem(value: AppThemeMode.dark, child: Text('Oscuro')),
+              DropdownMenuItem(value: AppThemeMode.light, child: Text('Claro')),
+              DropdownMenuItem(value: AppThemeMode.system, child: Text('Sistema')),
+            ],
+            onChanged: (mode) {
+              if (mode != null) {
+                ref.read(themeProvider.notifier).setTheme(mode);
+              }
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _sectionHeader(String title) {
     return Padding(
       padding: const EdgeInsets.only(left: 4, bottom: 4),
@@ -126,6 +187,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   Widget _switchTile(IconData icon, String title, String subtitle, bool value, ValueChanged<bool> onChanged) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
@@ -144,8 +206,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w500)),
-                Text(subtitle, style: const TextStyle(color: AppColors.textMuted, fontSize: 12)),
+                Text(title, style: TextStyle(color: isDark ? Colors.white : AppColors.lightText, fontSize: 14, fontWeight: FontWeight.w500)),
+                Text(subtitle, style: TextStyle(color: isDark ? AppColors.textMuted : AppColors.lightTextSecondary, fontSize: 12)),
               ],
             ),
           ),
@@ -161,19 +223,21 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   Widget _infoTile(String label, String value) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: const TextStyle(color: AppColors.textSecondary, fontSize: 14)),
-          Text(value, style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w500)),
+          Text(label, style: TextStyle(color: isDark ? AppColors.textSecondary : AppColors.lightTextSecondary, fontSize: 14)),
+          Text(value, style: TextStyle(color: isDark ? Colors.white : AppColors.lightText, fontSize: 14, fontWeight: FontWeight.w500)),
         ],
       ),
     );
   }
 
   Widget _updateTile() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: InkWell(
@@ -191,16 +255,16 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               child: const Icon(Icons.system_update, color: AppColors.primary, size: 20),
             ),
             const SizedBox(width: 14),
-            const Expanded(
+            Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Buscar actualizaciones', style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w500)),
-                  Text('Tocar para buscar nueva versión', style: TextStyle(color: AppColors.textMuted, fontSize: 12)),
+                  Text('Buscar actualizaciones', style: TextStyle(color: isDark ? Colors.white : AppColors.lightText, fontSize: 14, fontWeight: FontWeight.w500)),
+                  Text('Tocar para buscar nueva versión', style: TextStyle(color: isDark ? AppColors.textMuted : AppColors.lightTextSecondary, fontSize: 12)),
                 ],
               ),
             ),
-            const Icon(Icons.chevron_right, color: AppColors.textMuted, size: 20),
+            Icon(Icons.chevron_right, color: isDark ? AppColors.textMuted : AppColors.lightTextSecondary, size: 20),
           ],
         ),
       ),
@@ -211,7 +275,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (_) => const _UpdateCheckDialog(),
+      builder: (_) => const UpdateCheckDialog(),
     );
 
     final info = await UpdateService.checkForUpdate(AppInfo.version);
@@ -230,55 +294,25 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     }
 
     if (!mounted) return;
-    _showUpdateDialog(info);
-  }
-
-  void _showUpdateDialog(UpdateInfo info) {
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: AppColors.surfaceCard,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        title: const Row(
-          children: [
-            Icon(Icons.system_update, color: AppColors.primary, size: 28),
-            SizedBox(width: 12),
-            Text('Actualización disponible', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Versión: ${info.version}',
-              style: const TextStyle(color: AppColors.primary, fontSize: 16, fontWeight: FontWeight.w600),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              info.changelog,
-              style: const TextStyle(color: AppColors.textSecondary, fontSize: 13),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Más tarde', style: TextStyle(color: AppColors.textMuted)),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            ),
-            onPressed: () {
-              Navigator.pop(ctx);
-              _downloadAndInstall(info);
-            },
-            child: const Text('Actualizar ahora'),
-          ),
-        ],
+      builder: (ctx) => UpdateAvailableDialog(
+        info: info,
+        onDownload: () {
+          Navigator.pop(ctx);
+          _downloadAndInstall(info);
+        },
+        onSkip: () {
+          UpdateService.skipVersion(info.version);
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Versión saltada'),
+                backgroundColor: AppColors.textMuted,
+              ),
+            );
+          }
+        },
       ),
     );
   }
@@ -287,7 +321,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (_) => const _UpdateProgressDialog(),
+      builder: (_) => const UpdateProgressDialog(),
     );
 
     final success = await UpdateService.downloadAndInstall(info);
@@ -310,69 +344,5 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         ),
       );
     }
-  }
-}
-
-class _UpdateCheckDialog extends StatelessWidget {
-  const _UpdateCheckDialog();
-
-  @override
-  Widget build(BuildContext context) {
-    return Dialog(
-      backgroundColor: Colors.transparent,
-      child: GlassCard(
-        padding: const EdgeInsets.all(32),
-        child: const Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            SizedBox(
-              height: 50,
-              width: 50,
-              child: CircularProgressIndicator(
-                strokeWidth: 3,
-                valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
-              ),
-            ),
-            SizedBox(height: 20),
-            Text(
-              'Buscando actualizaciones...',
-              style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _UpdateProgressDialog extends StatelessWidget {
-  const _UpdateProgressDialog();
-
-  @override
-  Widget build(BuildContext context) {
-    return Dialog(
-      backgroundColor: Colors.transparent,
-      child: GlassCard(
-        padding: const EdgeInsets.all(32),
-        child: const Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            SizedBox(
-              height: 50,
-              width: 50,
-              child: CircularProgressIndicator(
-                strokeWidth: 3,
-                valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
-              ),
-            ),
-            SizedBox(height: 20),
-            Text(
-              'Descargando actualización...',
-              style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 }

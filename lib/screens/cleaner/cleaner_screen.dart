@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/constants.dart';
+import '../../core/utils.dart';
 import '../../providers/cleaner_provider.dart';
 import '../../widgets/glass_card.dart';
+import '../../widgets/progress_indicators.dart';
 import '../../widgets/gradient_button.dart';
 import '../../models/cleanup_item.dart';
 
@@ -113,7 +116,13 @@ class _CleanerScreenState extends ConsumerState<CleanerScreen> {
                   ],
                 ],
               ),
-              loading: () => const SizedBox(),
+              loading: () => const Column(
+                children: [
+                  SkeletonCard(),
+                  SkeletonCard(),
+                  SkeletonCard(),
+                ],
+              ),
               error: (err, _) => GlassCard(
                 child: Center(
                   child: Column(
@@ -123,7 +132,10 @@ class _CleanerScreenState extends ConsumerState<CleanerScreen> {
                       Text('Error: $err', style: const TextStyle(color: AppColors.textMuted)),
                       const SizedBox(height: 8),
                       TextButton(
-                        onPressed: () => ref.invalidate(scanResultProvider),
+                      onPressed: () {
+                        HapticFeedback.lightImpact();
+                        ref.invalidate(scanResultProvider);
+                      },
                         child: const Text('Reintentar'),
                       ),
                     ],
@@ -142,6 +154,7 @@ class _CleanerScreenState extends ConsumerState<CleanerScreen> {
     final selected = ref.read(selectedItemsProvider);
     if (selected.isEmpty) return;
 
+    HapticFeedback.mediumImpact();
     ref.read(cleaningInProgressProvider.notifier).state = true;
     showDialog(
       context: context,
@@ -176,7 +189,7 @@ class _CleanerScreenState extends ConsumerState<CleanerScreen> {
             const SizedBox(height: 16),
             const Text('¡Limpieza completada!', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
             const SizedBox(height: 12),
-            Text('Espacio liberado: ${_formatBytes(freed)}', style: const TextStyle(fontSize: 14, color: AppColors.textSecondary)),
+            Text('Espacio liberado: ${formatBytes(freed)}', style: const TextStyle(fontSize: 14, color: AppColors.textSecondary)),
           ],
         ),
         actions: [
@@ -188,15 +201,6 @@ class _CleanerScreenState extends ConsumerState<CleanerScreen> {
       ),
     );
   }
-
-  String _formatBytes(int bytes) {
-    if (bytes < 1024) return '$bytes B';
-    if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(0)} KB';
-    if (bytes < 1024 * 1024 * 1024) {
-      return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
-    }
-    return '${(bytes / (1024 * 1024 * 1024)).toStringAsFixed(1)} GB';
-  }
 }
 
 class _CleanupItemCard extends StatelessWidget {
@@ -205,6 +209,7 @@ class _CleanupItemCard extends StatelessWidget {
   final VoidCallback onToggle;
 
   const _CleanupItemCard({
+    super.key,
     required this.item,
     required this.isSelected,
     required this.onToggle,
@@ -268,7 +273,7 @@ class _CleanupItemCard extends StatelessWidget {
 }
 
 class _CleaningDialog extends StatelessWidget {
-  const _CleaningDialog();
+  const _CleaningDialog({super.key});
 
   @override
   Widget build(BuildContext context) {
