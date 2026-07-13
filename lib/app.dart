@@ -69,7 +69,7 @@ class _AppEntryState extends ConsumerState<_AppEntry> {
   Widget build(BuildContext context) {
     switch (_state) {
       case _AppEntryStateEnum.loading:
-        return const SplashScreen(child: SizedBox());
+        return const SplashScreen();
       case _AppEntryStateEnum.onboarding:
         return const OnboardingScreen();
       case _AppEntryStateEnum.main:
