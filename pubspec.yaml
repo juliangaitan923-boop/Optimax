@@ -22,12 +22,23 @@ dependencies:
   package_info_plus: ^8.0.0
   logger: ^2.0.2+1
   permission_handler: ^11.3.0
+  url_launcher: ^6.2.4
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^3.0.1
+  flutter_launcher_icons: ^0.13.1
+
+flutter_launcher_icons:
+  android: true
+  ios: false
+  image_path: "assets/icon.png"
+  adaptive_icon_background: "#6347FF"
+  adaptive_icon_foreground: "assets/icon_foreground.png"
 
 flutter:
   uses-material-design: true
   generate: true
+  assets:
+    - assets/

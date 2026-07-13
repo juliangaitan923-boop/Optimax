@@ -6,7 +6,8 @@ import '../../core/constants.dart';
 import '../../core/theme_colors.dart';
 
 class PermissionGuideScreen extends ConsumerStatefulWidget {
-  const PermissionGuideScreen({super.key});
+  final VoidCallback? onCompleted;
+  const PermissionGuideScreen({super.key, this.onCompleted});
 
   @override
   ConsumerState<PermissionGuideScreen> createState() => _PermissionGuideScreenState();
@@ -67,7 +68,7 @@ class _PermissionGuideScreenState extends ConsumerState<PermissionGuideScreen> {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('permissions_guided', true);
     if (mounted) {
-      Navigator.of(context).pushReplacementNamed('/home');
+      widget.onCompleted?.call();
     }
   }
 

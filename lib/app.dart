@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'core/constants.dart';
@@ -79,9 +80,17 @@ class _AppEntryState extends ConsumerState<_AppEntry> {
       case _AppEntryStateEnum.loading:
         return const SplashScreen();
       case _AppEntryStateEnum.onboarding:
-        return const OnboardingScreen();
+        return OnboardingScreen(
+          onCompleted: () {
+            _checkOnboarding();
+          },
+        );
       case _AppEntryStateEnum.permissions:
-        return const PermissionGuideScreen();
+        return PermissionGuideScreen(
+          onCompleted: () {
+            _checkOnboarding();
+          },
+        );
       case _AppEntryStateEnum.main:
         return const MainShell();
     }
@@ -200,7 +209,10 @@ class _MainShellState extends ConsumerState<MainShell> {
           borderRadius: BorderRadius.circular(28),
           child: BottomNavigationBar(
             currentIndex: safeIndex,
-            onTap: (index) => ref.read(tabIndexProvider.notifier).state = index.clamp(0, 3),
+            onTap: (index) {
+              HapticFeedback.selectionClick();
+              ref.read(tabIndexProvider.notifier).state = index.clamp(0, 3);
+            },
             elevation: 0,
             backgroundColor: Colors.transparent,
             selectedItemColor: AppTheme.primary,

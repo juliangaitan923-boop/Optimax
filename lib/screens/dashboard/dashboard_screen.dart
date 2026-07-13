@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/constants.dart';
 import '../../core/theme_colors.dart';
 import '../../providers/system_providers.dart';
+import '../../providers/device_info_provider.dart';
 import '../../widgets/glass_card.dart';
 import '../../widgets/gradient_button.dart';
 import '../../widgets/progress_indicators.dart';
@@ -29,11 +30,14 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     final healthScore = ref.watch(healthScoreProvider);
     final isBoosting = ref.watch(isBoostingProvider);
     final history = ref.watch(historyServiceProvider);
+    final deviceInfoAsync = ref.watch(deviceInfoProvider);
 
     final cpu = cpuAsync.valueOrNull;
     final ram = ramAsync.valueOrNull;
     final storage = storageAsync.valueOrNull;
     final battery = batteryAsync.valueOrNull;
+
+    final isLoading = cpu == null && ram == null && storage == null && battery == null;
 
     final cpuSpots = history.cpuHistory.map((p) => FlSpot(p.time.millisecondsSinceEpoch.toDouble(), p.value)).toList();
     final ramSpots = history.ramHistory.map((p) => FlSpot(p.time.millisecondsSinceEpoch.toDouble(), p.value)).toList();
@@ -72,6 +76,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             child: IconButton(
               icon: const Icon(Icons.refresh_rounded),
               onPressed: () {
+                HapticFeedback.lightImpact();
                 ref.invalidate(cpuInfoProvider);
                 ref.invalidate(ramInfoProvider);
                 ref.invalidate(storageInfoProvider);
@@ -98,22 +103,38 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           child: Column(
             children: [
               const SizedBox(height: 8),
-              // Health Score
-              GlassCard(
-                child: Column(
+              if (isLoading)
+                const Column(
                   children: [
-                    Text(AppStrings.healthScore, style: TextStyle(color: context.textSecondary, fontSize: 14)),
-                    const SizedBox(height: 12),
-                    AnimatedCircularScore(score: healthScore),
-                    const SizedBox(height: 12),
+                    SkeletonCard(),
+                    SizedBox(height: 16),
+                    SkeletonCard(lineCount: 4),
+                    SizedBox(height: 16),
                   ],
                 ),
-              ),
-              const SizedBox(height: 16),
+              if (!isLoading) ...[
+                // Health Score
+                GlassCard(
+                  child: Column(
+                    children: [
+                      Text(AppStrings.healthScore, style: TextStyle(color: context.textSecondary, fontSize: 14)),
+                      const SizedBox(height: 12),
+                    AnimatedCircularScore(score: healthScore),
+                    const SizedBox(height: 8),
+                    deviceInfoAsync.when(
+                      data: (d) => Text(d, style: TextStyle(color: context.textMuted, fontSize: 11)),
+                      loading: () => const SizedBox.shrink(),
+                      error: (_, __) => const SizedBox.shrink(),
+                    ),
+                    const SizedBox(height: 12),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
 
-              // Resource Cards with sparklines
-              GlassCard(
-                padding: const EdgeInsets.all(16),
+                // Resource Cards with sparklines
+                GlassCard(
+                  padding: const EdgeInsets.all(16),
                 child: Column(
                   children: [
                     Row(
@@ -218,6 +239,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   label: const Text('Limpiar historial de gráficos', style: TextStyle(fontSize: 12)),
                   style: TextButton.styleFrom(foregroundColor: context.textMuted),
                   onPressed: () {
+                    HapticFeedback.selectionClick();
                     ref.read(historyServiceProvider).clear();
                     ref.invalidate(cpuInfoProvider);
                     ref.invalidate(ramInfoProvider);
@@ -226,6 +248,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 ),
               ),
               const SizedBox(height: 24),
+              ],
             ],
           ),
         ),

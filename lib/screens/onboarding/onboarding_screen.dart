@@ -4,7 +4,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/constants.dart';
 
 class OnboardingScreen extends ConsumerStatefulWidget {
-  const OnboardingScreen({super.key});
+  final VoidCallback? onCompleted;
+  const OnboardingScreen({super.key, this.onCompleted});
 
   @override
   ConsumerState<OnboardingScreen> createState() => _OnboardingScreenState();
@@ -41,7 +42,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('onboarding_completed', true);
     if (mounted) {
-      Navigator.of(context).pushReplacementNamed('/home');
+      widget.onCompleted?.call();
     }
   }
 

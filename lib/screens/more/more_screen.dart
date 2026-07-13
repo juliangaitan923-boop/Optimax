@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../core/constants.dart';
 import '../../core/theme_colors.dart';
 import '../../services/app_info.dart';
+import '../../utils/haptic_utils.dart';
+import '../../utils/navigation_utils.dart';
 import '../../widgets/glass_card.dart';
 import 'app_analyzer_screen.dart';
 import 'storage_analyzer_screen.dart';
@@ -158,21 +162,27 @@ class MoreScreen extends ConsumerWidget {
   }
 
   void _navigate(BuildContext context, Widget screen) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => screen),
-    );
+    hapticClick();
+    pushWithTransition(context, screen);
   }
 
   void _shareApp(BuildContext context) {
+    hapticClick();
+    Clipboard.setData(const ClipboardData(text: 'Descarga OptiMax para optimizar tu dispositivo: https://github.com/juliangaitan923-boop/Optimax/releases'));
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Compartir OptiMax - función disponible pronto')),
+      const SnackBar(content: Text('Enlace copiado al portapapeles')),
     );
   }
 
-  void _rateApp(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Valorar en Play Store - función disponible pronto')),
-    );
+  Future<void> _rateApp(BuildContext context) async {
+    hapticClick();
+    final uri = Uri.parse('https://github.com/juliangaitan923-boop/Optimax/releases');
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No se pudo abrir el enlace')),
+      );
+    }
   }
 }
