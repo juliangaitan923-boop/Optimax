@@ -8,6 +8,7 @@ import 'screens/cleaner/cleaner_screen.dart';
 import 'screens/battery/battery_screen.dart';
 import 'screens/more/more_screen.dart';
 import 'screens/onboarding/onboarding_screen.dart';
+import 'screens/permissions/permission_guide_screen.dart';
 import 'screens/splash_screen.dart';
 import 'providers/system_providers.dart';
 import 'providers/theme_provider.dart';
@@ -40,7 +41,7 @@ class _AppEntry extends ConsumerStatefulWidget {
   ConsumerState<_AppEntry> createState() => _AppEntryState();
 }
 
-enum _AppEntryStateEnum { loading, onboarding, main }
+enum _AppEntryStateEnum { loading, onboarding, permissions, main }
 
 class _AppEntryState extends ConsumerState<_AppEntry> {
   _AppEntryStateEnum _state = _AppEntryStateEnum.loading;
@@ -55,8 +56,15 @@ class _AppEntryState extends ConsumerState<_AppEntry> {
     try {
       final prefs = await SharedPreferences.getInstance();
       final completed = prefs.getBool('onboarding_completed') ?? false;
+      final permissionsDone = prefs.getBool('permissions_guided') ?? false;
       if (mounted) {
-        setState(() => _state = completed ? _AppEntryStateEnum.main : _AppEntryStateEnum.onboarding);
+        if (!completed) {
+          setState(() => _state = _AppEntryStateEnum.onboarding);
+        } else if (!permissionsDone) {
+          setState(() => _state = _AppEntryStateEnum.permissions);
+        } else {
+          setState(() => _state = _AppEntryStateEnum.main);
+        }
       }
     } catch (e) {
       if (mounted) {
@@ -72,6 +80,8 @@ class _AppEntryState extends ConsumerState<_AppEntry> {
         return const SplashScreen();
       case _AppEntryStateEnum.onboarding:
         return const OnboardingScreen();
+      case _AppEntryStateEnum.permissions:
+        return const PermissionGuideScreen();
       case _AppEntryStateEnum.main:
         return const MainShell();
     }

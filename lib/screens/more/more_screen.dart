@@ -72,22 +72,32 @@ class MoreScreen extends ConsumerWidget {
             GlassCard(
               child: Padding(
                 padding: const EdgeInsets.all(16),
-                child: Row(
+                child: Column(
                   children: [
-                    Icon(Icons.info_outline, color: context.textMuted, size: 20),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('OptiMax v${AppInfo.version}', style: TextStyle(color: context.textPrimary, fontSize: 14, fontWeight: FontWeight.w500)),
-                          const SizedBox(height: 2),
-                          Text(
-                            'Optimiza tu dispositivo sin modificarlo',
-                            style: TextStyle(color: context.textMuted.withOpacity(0.7), fontSize: 12),
+                    Row(
+                      children: [
+                        Icon(Icons.info_outline, color: context.textMuted, size: 20),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('OptiMax v${AppInfo.version}', style: TextStyle(color: context.textPrimary, fontSize: 14, fontWeight: FontWeight.w500)),
+                              const SizedBox(height: 2),
+                              Text('Optimiza tu dispositivo sin modificarlo', style: TextStyle(color: context.textMuted.withOpacity(0.7), fontSize: 12)),
+                            ],
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    const Divider(color: Colors.white10, height: 1),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        _bottomAction(context, Icons.share, 'Compartir', () => _shareApp(context)),
+                        _bottomAction(context, Icons.star_border, 'Valorar', () => _rateApp(context)),
+                      ],
                     ),
                   ],
                 ),
@@ -95,6 +105,25 @@ class MoreScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 24),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _bottomAction(BuildContext context, IconData icon, String label, VoidCallback onTap) {
+    return Expanded(
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: Column(
+            children: [
+              Icon(icon, color: AppColors.primary, size: 22),
+              const SizedBox(height: 6),
+              Text(label, style: TextStyle(color: context.textMuted, fontSize: 12)),
+            ],
+          ),
         ),
       ),
     );
@@ -132,6 +161,18 @@ class MoreScreen extends ConsumerWidget {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (_) => screen),
+    );
+  }
+
+  void _shareApp(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Compartir OptiMax - función disponible pronto')),
+    );
+  }
+
+  void _rateApp(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Valorar en Play Store - función disponible pronto')),
     );
   }
 }
